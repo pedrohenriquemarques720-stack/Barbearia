@@ -4,13 +4,7 @@ import datetime
 import os
 import json
 import hashlib
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-import plotly.graph_objects as go
-import plotly.express as px
-from PIL import Image
 import base64
 import random
 import string
@@ -146,7 +140,17 @@ def carregar_dados():
     if os.path.exists("agendamentos.csv"):
         df = pd.read_csv("agendamentos.csv")
         if 'data_agendamento' in df.columns:
-            df['data_agendamento'] = pd.to_datetime(df['data_agendamento'])
+            df['data_agendamento'] = pd.to_datetime(df['data_agendamento'], errors='coerce')
+        # Garantir que todas as colunas existem
+        colunas_necessarias = [
+            "id", "nome", "email", "telefone", "horario", "servicos", 
+            "valor_total", "corte_simples", "barba", "sobrancelha",
+            "pigmentacao", "luzes", "descolorimento", "data_agendamento",
+            "status", "observacoes", "confirmado"
+        ]
+        for col in colunas_necessarias:
+            if col not in df.columns:
+                df[col] = None
         return df
     else:
         return pd.DataFrame(columns=[
@@ -179,17 +183,6 @@ def salvar_financeiro(financeiro):
     with open("financeiro.json", "w") as f:
         json.dump(financeiro, f, indent=2)
 
-# ==================== FUNÇÕES DE NOTIFICAÇÃO ====================
-def enviar_whatsapp(telefone, mensagem):
-    # Simulação de envio de WhatsApp
-    whatsapp_url = f"https://wa.me/{telefone}?text={mensagem}"
-    return whatsapp_url
-
-def enviar_email(destinatario, assunto, corpo):
-    # Simulação de envio de email
-    # Em produção, configurar SMTP real
-    return True
-
 # ==================== FUNÇÕES DE RELATÓRIOS ====================
 def gerar_relatorio_periodo(df, data_inicio, data_fim):
     mask = (df['data_agendamento'].dt.date >= data_inicio) & (df['data_agendamento'].dt.date <= data_fim)
@@ -197,15 +190,15 @@ def gerar_relatorio_periodo(df, data_inicio, data_fim):
     
     relatorio = {
         "total_agendamentos": len(df_filtrado),
-        "receita_total": df_filtrado['valor_total'].sum(),
+        "receita_total": df_filtrado['valor_total'].sum() if len(df_filtrado) > 0 else 0,
         "ticket_medio": df_filtrado['valor_total'].mean() if len(df_filtrado) > 0 else 0,
         "servicos_mais_vendidos": {
-            "Corte Simples": df_filtrado['corte_simples'].sum(),
-            "Barba": df_filtrado['barba'].sum(),
-            "Sobrancelha": df_filtrado['sobrancelha'].sum(),
-            "Pigmentação": df_filtrado['pigmentacao'].sum(),
-            "Luzes": df_filtrado['luzes'].sum(),
-            "Descolorimento": df_filtrado['descolorimento'].sum()
+            "Corte Simples": df_filtrado['corte_simples'].sum() if len(df_filtrado) > 0 else 0,
+            "Barba": df_filtrado['barba'].sum() if len(df_filtrado) > 0 else 0,
+            "Sobrancelha": df_filtrado['sobrancelha'].sum() if len(df_filtrado) > 0 else 0,
+            "Pigmentação": df_filtrado['pigmentacao'].sum() if len(df_filtrado) > 0 else 0,
+            "Luzes": df_filtrado['luzes'].sum() if len(df_filtrado) > 0 else 0,
+            "Descolorimento": df_filtrado['descolorimento'].sum() if len(df_filtrado) > 0 else 0
         }
     }
     return relatorio
@@ -576,8 +569,8 @@ usuarios = criar_usuario_admin()
 with st.sidebar:
     st.markdown("""
         <div style="text-align: center; padding: 20px;">
-            <h1 style="font-size: 2em;">💈</h1>
-            <h2>Barber Club PRO</h2>
+            <h1 style="font-size: 3em;">💈</h1>
+            <h2 style="color: #e65c00;">Barber Club PRO</h2>
             <p>Sistema de Gestão Profissional</p>
         </div>
     """, unsafe_allow_html=True)
@@ -597,7 +590,6 @@ with st.sidebar:
     st.markdown("### 📍 Informações")
     st.markdown(f"**Endereço:** {Config.BARBEARIA_ENDERECO}")
     st.markdown(f"**📞 Telefone:** {Config.BARBEARIA_TELEFONE}")
-    st.markdown(f"**💬 WhatsApp:** {Config.BARBEARIA_WHATSAPP}")
     st.markdown(f"**⏰ Horário:** {Config.HORARIO_ABERTURA} às {Config.HORARIO_FECHAMENTO}")
     
     st.markdown("---")
@@ -606,12 +598,14 @@ with st.sidebar:
     if len(df_agendamentos) > 0:
         st.markdown("### 📊 Hoje")
         hoje = datetime.now().date()
-        agendamentos_hoje = df_agendamentos[df_agendamentos['data_agendamento'].dt.date == hoje]
-        st.metric("Agendamentos Hoje", len(agendamentos_hoje))
-        
-        if len(agendamentos_hoje) > 0:
-            receita_hoje = agendamentos_hoje['valor_total'].sum()
-            st.metric("Receita Hoje", f"R$ {receita_hoje:.2f}")
+        if 'data_agendamento' in df_agendamentos.columns:
+            df_agendamentos['data_agendamento'] = pd.to_datetime(df_agendamentos['data_agendamento'], errors='coerce')
+            agendamentos_hoje = df_agendamentos[df_agendamentos['data_agendamento'].dt.date == hoje]
+            st.metric("Agendamentos Hoje", len(agendamentos_hoje))
+            
+            if len(agendamentos_hoje) > 0:
+                receita_hoje = agendamentos_hoje['valor_total'].sum()
+                st.metric("Receita Hoje", f"R$ {receita_hoje:.2f}")
 
 # ==================== DASHBOARD ====================
 if menu == "🏠 Dashboard":
@@ -622,83 +616,89 @@ if menu == "🏠 Dashboard":
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown("""
+        st.markdown(f"""
             <div class="metric-premium">
                 <h3>Total Clientes</h3>
-                <h1 style="font-size: 2.5em;">{}</h1>
+                <h1 style="font-size: 2.5em;">{len(clientes)}</h1>
             </div>
-        """.format(len(clientes)), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("""
+        st.markdown(f"""
             <div class="metric-premium">
                 <h3>Agendamentos</h3>
-                <h1 style="font-size: 2.5em;">{}</h1>
+                <h1 style="font-size: 2.5em;">{len(df_agendamentos)}</h1>
             </div>
-        """.format(len(df_agendamentos)), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col3:
         receita_total = df_agendamentos['valor_total'].sum() if len(df_agendamentos) > 0 else 0
-        st.markdown("""
+        st.markdown(f"""
             <div class="metric-premium">
                 <h3>Receita Total</h3>
-                <h1 style="font-size: 2em;">R$ {:.2f}</h1>
+                <h1 style="font-size: 2em;">R$ {receita_total:.2f}</h1>
             </div>
-        """.format(receita_total), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col4:
         ticket_medio = df_agendamentos['valor_total'].mean() if len(df_agendamentos) > 0 else 0
-        st.markdown("""
+        st.markdown(f"""
             <div class="metric-premium">
                 <h3>Ticket Médio</h3>
-                <h1 style="font-size: 2em;">R$ {:.2f}</h1>
+                <h1 style="font-size: 2em;">R$ {ticket_medio:.2f}</h1>
             </div>
-        """.format(ticket_medio), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Gráficos
+    # Gráficos com Streamlit nativo
     col1, col2 = st.columns(2)
     
     with col1:
         st.subheader("📈 Agendamentos por Mês")
-        if len(df_agendamentos) > 0:
+        if len(df_agendamentos) > 0 and 'data_agendamento' in df_agendamentos.columns:
             df_agendamentos['mes'] = df_agendamentos['data_agendamento'].dt.strftime('%Y-%m')
             agendamentos_mes = df_agendamentos.groupby('mes').size().reset_index(name='quantidade')
-            fig = px.bar(agendamentos_mes, x='mes', y='quantidade', title="Agendamentos Mensais")
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig, use_container_width=True)
+            if len(agendamentos_mes) > 0:
+                st.bar_chart(agendamentos_mes.set_index('mes'))
+            else:
+                st.info("Sem dados para exibir")
     
     with col2:
         st.subheader("💰 Receita por Mês")
-        if len(df_agendamentos) > 0:
+        if len(df_agendamentos) > 0 and 'data_agendamento' in df_agendamentos.columns:
             receita_mes = df_agendamentos.groupby('mes')['valor_total'].sum().reset_index()
-            fig = px.line(receita_mes, x='mes', y='valor_total', title="Receita Mensal")
-            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig, use_container_width=True)
+            if len(receita_mes) > 0:
+                st.line_chart(receita_mes.set_index('mes'))
+            else:
+                st.info("Sem dados para exibir")
     
     st.markdown("---")
     
     # Próximos agendamentos
     st.subheader("📅 Próximos Agendamentos")
-    if len(df_agendamentos) > 0:
+    if len(df_agendamentos) > 0 and 'data_agendamento' in df_agendamentos.columns:
         hoje = datetime.now()
         proximos = df_agendamentos[df_agendamentos['data_agendamento'] > hoje].sort_values('data_agendamento').head(10)
         
-        for idx, row in proximos.iterrows():
-            with st.container():
-                col1, col2, col3, col4 = st.columns([2, 2, 3, 1])
-                with col1:
-                    st.write(f"**{row['nome']}**")
-                with col2:
-                    st.write(f"📅 {row['data_agendamento'].strftime('%d/%m/%Y %H:%M')}")
-                with col3:
-                    st.write(f"✂️ {row['servicos']}")
-                with col4:
-                    st.write(f"💰 R$ {row['valor_total']}")
-                st.markdown("---")
+        if len(proximos) > 0:
+            for idx, row in proximos.iterrows():
+                with st.container():
+                    col1, col2, col3, col4 = st.columns([2, 2, 3, 1])
+                    with col1:
+                        st.write(f"**{row['nome']}**")
+                    with col2:
+                        if pd.notna(row['data_agendamento']):
+                            st.write(f"📅 {row['data_agendamento'].strftime('%d/%m/%Y %H:%M')}")
+                    with col3:
+                        st.write(f"✂️ {row['servicos']}")
+                    with col4:
+                        st.write(f"💰 R$ {row['valor_total']}")
+                    st.markdown("---")
+        else:
+            st.info("Nenhum agendamento futuro encontrado.")
     else:
-        st.info("Nenhum agendamento futuro encontrado.")
+        st.info("Nenhum agendamento cadastrado.")
 
 # ==================== AGENDAMENTOS ====================
 elif menu == "📅 Agendamentos":
@@ -741,6 +741,8 @@ elif menu == "📅 Agendamentos":
                     st.rerun()
                 except Exception as e:
                     st.error(f"Erro ao processar: {e}")
+        else:
+            st.error("Erro ao criar arquivo HTML")
     
     with tab2:
         st.header("📋 Todos os Agendamentos")
@@ -755,56 +757,60 @@ elif menu == "📅 Agendamentos":
             busca = st.text_input("Buscar por nome")
         
         df_filtrado = df_agendamentos.copy()
-        if status_filtro != "Todos":
+        if 'status' in df_filtrado.columns and status_filtro != "Todos":
             df_filtrado = df_filtrado[df_filtrado['status'] == status_filtro]
         if busca:
-            df_filtrado = df_filtrado[df_filtrado['nome'].str.contains(busca, case=False)]
+            df_filtrado = df_filtrado[df_filtrado['nome'].str.contains(busca, case=False, na=False)]
         
-        for idx, row in df_filtrado.iterrows():
-            with st.container():
-                col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
-                with col1:
-                    st.write(f"**👤 {row['nome']}**")
-                with col2:
-                    st.write(f"📅 {row['horario']}")
-                with col3:
-                    st.write(f"✂️ {row['servicos']}")
-                with col4:
-                    st.write(f"💰 R$ {row['valor_total']}")
-                with col5:
-                    status_cor = {
-                        "pendente": "🟡 Pendente",
-                        "confirmado": "🟢 Confirmado",
-                        "concluido": "🔵 Concluído",
-                        "cancelado": "🔴 Cancelado"
-                    }.get(row.get('status', 'pendente'), "🟡 Pendente")
-                    st.write(status_cor)
-                st.markdown("---")
-    
-    with tab3:
-        st.header("✅ Confirmar Agendamentos")
-        agendamentos_pendentes = df_agendamentos[df_agendamentos['status'] == 'pendente']
-        
-        if len(agendamentos_pendentes) > 0:
-            for idx, row in agendamentos_pendentes.iterrows():
+        if len(df_filtrado) > 0:
+            for idx, row in df_filtrado.iterrows():
                 with st.container():
-                    col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
+                    col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
                     with col1:
-                        st.write(f"**{row['nome']}**")
+                        st.write(f"**👤 {row['nome']}**")
                     with col2:
                         st.write(f"📅 {row['horario']}")
                     with col3:
                         st.write(f"✂️ {row['servicos']}")
                     with col4:
-                        if st.button(f"✅ Confirmar", key=f"confirm_{idx}"):
-                            df_agendamentos.at[idx, 'status'] = 'confirmado'
-                            df_agendamentos.at[idx, 'confirmado'] = True
-                            salvar_dados(df_agendamentos)
-                            st.success(f"Agendamento de {row['nome']} confirmado!")
-                            st.rerun()
+                        st.write(f"💰 R$ {row['valor_total']}")
+                    with col5:
+                        status_cor = {
+                            "pendente": "🟡 Pendente",
+                            "confirmado": "🟢 Confirmado",
+                            "concluido": "🔵 Concluído",
+                            "cancelado": "🔴 Cancelado"
+                        }.get(row.get('status', 'pendente'), "🟡 Pendente")
+                        st.write(status_cor)
                     st.markdown("---")
         else:
-            st.info("Nenhum agendamento pendente.")
+            st.info("Nenhum agendamento encontrado.")
+    
+    with tab3:
+        st.header("✅ Confirmar Agendamentos")
+        if 'status' in df_agendamentos.columns:
+            agendamentos_pendentes = df_agendamentos[df_agendamentos['status'] == 'pendente']
+            
+            if len(agendamentos_pendentes) > 0:
+                for idx, row in agendamentos_pendentes.iterrows():
+                    with st.container():
+                        col1, col2, col3, col4 = st.columns([2, 2, 2, 1])
+                        with col1:
+                            st.write(f"**{row['nome']}**")
+                        with col2:
+                            st.write(f"📅 {row['horario']}")
+                        with col3:
+                            st.write(f"✂️ {row['servicos']}")
+                        with col4:
+                            if st.button(f"✅ Confirmar", key=f"confirm_{idx}"):
+                                df_agendamentos.at[idx, 'status'] = 'confirmado'
+                                df_agendamentos.at[idx, 'confirmado'] = True
+                                salvar_dados(df_agendamentos)
+                                st.success(f"Agendamento de {row['nome']} confirmado!")
+                                st.rerun()
+                        st.markdown("---")
+            else:
+                st.info("Nenhum agendamento pendente.")
 
 # ==================== CLIENTES ====================
 elif menu == "👥 Clientes":
@@ -821,8 +827,9 @@ elif menu == "👥 Clientes":
             
             # Top clientes
             st.subheader("🏆 Top 5 Clientes")
-            top_clientes = df_clientes.nlargest(5, 'total_gasto')[['Nome', 'total_gasto', 'ultima_visita']]
-            st.dataframe(top_clientes, use_container_width=True)
+            if 'total_gasto' in df_clientes.columns:
+                top_clientes = df_clientes.nlargest(5, 'total_gasto')[['Nome', 'total_gasto', 'ultima_visita']]
+                st.dataframe(top_clientes, use_container_width=True)
         else:
             st.info("Nenhum cliente cadastrado.")
     
@@ -888,33 +895,28 @@ elif menu == "💰 Financeiro":
     
     with tab3:
         st.subheader("📈 Fluxo de Caixa")
-        # Gráfico de fluxo de caixa
-        receitas_mensais = {}
-        if len(df_agendamentos) > 0:
+        # Gráfico de fluxo de caixa com Streamlit nativo
+        if len(df_agendamentos) > 0 and 'data_agendamento' in df_agendamentos.columns:
             df_agendamentos['mes'] = df_agendamentos['data_agendamento'].dt.strftime('%Y-%m')
-            receitas_mensais = df_agendamentos.groupby('mes')['valor_total'].sum().to_dict()
-        
-        despesas_mensais = {}
-        for d in financeiro['despesas']:
-            mes = d['data'][:7]
-            despesas_mensais[mes] = despesas_mensais.get(mes, 0) + d['valor']
-        
-        todos_meses = sorted(set(list(receitas_mensais.keys()) + list(despesas_mensais.keys())))
-        
-        fluxo_df = pd.DataFrame({
-            'Mês': todos_meses,
-            'Receitas': [receitas_mensais.get(mes, 0) for mes in todos_meses],
-            'Despesas': [despesas_mensais.get(mes, 0) for mes in todos_meses]
-        })
-        fluxo_df['Lucro'] = fluxo_df['Receitas'] - fluxo_df['Despesas']
-        
-        fig = go.Figure()
-        fig.add_trace(go.Bar(name='Receitas', x=fluxo_df['Mês'], y=fluxo_df['Receitas'], marker_color='green'))
-        fig.add_trace(go.Bar(name='Despesas', x=fluxo_df['Mês'], y=fluxo_df['Despesas'], marker_color='red'))
-        fig.add_trace(go.Scatter(name='Lucro', x=fluxo_df['Mês'], y=fluxo_df['Lucro'], mode='lines+markers', line=dict(color='gold', width=3)))
-        
-        fig.update_layout(barmode='group', title="Fluxo de Caixa Mensal")
-        st.plotly_chart(fig, use_container_width=True)
+            receitas_mensais = df_agendamentos.groupby('mes')['valor_total'].sum()
+            
+            despesas_mensais = {}
+            for d in financeiro['despesas']:
+                mes = d['data'][:7]
+                despesas_mensais[mes] = despesas_mensais.get(mes, 0) + d['valor']
+            
+            if len(receitas_mensais) > 0:
+                fluxo_df = pd.DataFrame({
+                    'Mês': receitas_mensais.index,
+                    'Receitas': receitas_mensais.values,
+                    'Despesas': [despesas_mensais.get(mes, 0) for mes in receitas_mensais.index]
+                })
+                fluxo_df['Lucro'] = fluxo_df['Receitas'] - fluxo_df['Despesas']
+                
+                st.dataframe(fluxo_df, use_container_width=True)
+                st.line_chart(fluxo_df.set_index('Mês')[['Receitas', 'Despesas', 'Lucro']])
+            else:
+                st.info("Sem dados para exibir")
 
 # ==================== RELATÓRIOS ====================
 elif menu == "📊 Relatórios":
@@ -944,14 +946,20 @@ elif menu == "📊 Relatórios":
             st.bar_chart(servicos_df)
             
             # Exportar relatório
-            csv = df_agendamentos[(df_agendamentos['data_agendamento'].dt.date >= data_inicio) & 
-                                   (df_agendamentos['data_agendamento'].dt.date <= data_fim)].to_csv(index=False)
-            st.download_button(
-                label="📥 Exportar Relatório (CSV)",
-                data=csv,
-                file_name=f"relatorio_{data_inicio}_{data_fim}.csv",
-                mime="text/csv"
-            )
+            df_filtrado = df_agendamentos[(df_agendamentos['data_agendamento'].dt.date >= data_inicio) & 
+                                           (df_agendamentos['data_agendamento'].dt.date <= data_fim)]
+            if len(df_filtrado) > 0:
+                csv = df_filtrado.to_csv(index=False)
+                st.download_button(
+                    label="📥 Exportar Relatório (CSV)",
+                    data=csv,
+                    file_name=f"relatorio_{data_inicio}_{data_fim}.csv",
+                    mime="text/csv"
+                )
+            else:
+                st.info("Nenhum dado no período selecionado")
+        else:
+            st.info("Nenhum agendamento cadastrado")
 
 # ==================== CONFIGURAÇÕES ====================
 elif menu == "⚙️ Configurações":
