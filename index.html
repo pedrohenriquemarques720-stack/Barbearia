@@ -543,7 +543,7 @@
             const container = document.getElementById('agendamentos-table');
             if (!container) return;
             
-            let html = '<table><thead><tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+            let html = '\\\\(\\\\(<thead>\\\\<tr>\\\\<th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th><th>Ações</th>\\\\</tr>\\\\</thead><tbody>';
             agendamentos.forEach(a => {
                 html += `<tr>
                     <td><strong>${a[2]}</strong></td>
