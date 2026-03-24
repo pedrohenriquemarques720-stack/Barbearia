@@ -8,7 +8,7 @@ import os
 
 # Configuração da página
 st.set_page_config(
-    page_title="Barber Club PRO",
+    page_title="Barbearia Du Cortz",
     page_icon="💈",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -42,12 +42,12 @@ st.markdown("""
         
         /* Estilos gerais */
         .stApp {
-            background: linear-gradient(135deg, #1C1C1C 0%, #2C2C2C 100%);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
         
         /* Títulos */
         h1, h2, h3 {
-            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
+            background: linear-gradient(135deg, #C0C0C0 0%, #8B0000 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: bold;
@@ -55,16 +55,16 @@ st.markdown("""
         
         /* Cards */
         .premium-card {
-            background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(44,44,44,0.9) 100%);
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.9) 100%);
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid #D4AF37;
+            border: 1px solid #C0C0C0;
             box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5);
         }
         
         /* Botões */
         .stButton > button {
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #C0C0C0 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -75,7 +75,7 @@ st.markdown("""
         
         /* Métricas */
         .metric-premium {
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #C0C0C0 100%);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
@@ -86,15 +86,15 @@ st.markdown("""
         .stTextInput > div > div > input,
         .stNumberInput > div > div > input,
         .stSelectbox > div > div {
-            background-color: #3C3C3C;
+            background-color: #2a2a2a;
             color: white;
-            border: 1px solid #D4AF37;
+            border: 1px solid #C0C0C0;
             border-radius: 10px;
         }
         
         /* Tabelas */
         .dataframe {
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border-radius: 10px;
             color: white;
         }
@@ -252,7 +252,7 @@ def get_html_content(active_page="dashboard"):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Barber Club PRO</title>
+    <title>Barbearia Du Cortz</title>
     <style>
         * {{
             margin: 0;
@@ -262,18 +262,19 @@ def get_html_content(active_page="dashboard"):
         
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #1C1C1C 0%, #2C2C2C 100%);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             min-height: 100vh;
         }}
         
         /* Top Navigation */
         .top-nav {{
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             padding: 12px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border-bottom: 2px solid #C0C0C0;
         }}
         
         .nav-container {{
@@ -291,10 +292,23 @@ def get_html_content(active_page="dashboard"):
             font-size: 1.5rem;
             font-weight: bold;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }}
+        
+        .logo-icon {{
+            font-size: 2rem;
+        }}
+        
+        .logo-text {{
+            background: linear-gradient(135deg, #C0C0C0 0%, #fff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }}
         
         .logo span {{
-            color: #D4AF37;
+            color: #C0C0C0;
         }}
         
         .nav-links {{
@@ -304,9 +318,9 @@ def get_html_content(active_page="dashboard"):
         }}
         
         .nav-btn {{
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
             color: white;
-            border: none;
+            border: 1px solid #C0C0C0;
             padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
@@ -317,7 +331,8 @@ def get_html_content(active_page="dashboard"):
         }}
         
         .nav-btn:hover, .nav-btn.active {{
-            background: rgba(255,255,255,0.2);
+            background: #8B0000;
+            border-color: #C0C0C0;
             transform: translateY(-2px);
         }}
         
@@ -343,18 +358,21 @@ def get_html_content(active_page="dashboard"):
         
         /* Cards */
         .card {{
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid #D4AF37;
+            border: 1px solid #C0C0C0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }}
         
         .card-title {{
-            color: #D4AF37;
+            color: #C0C0C0;
             font-size: 1.2rem;
             margin-bottom: 15px;
             font-weight: bold;
+            border-left: 4px solid #8B0000;
+            padding-left: 12px;
         }}
         
         /* Grid */
@@ -374,17 +392,24 @@ def get_html_content(active_page="dashboard"):
         
         /* Metric Cards */
         .metric-card {{
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
             color: white;
+            border: 1px solid #C0C0C0;
+            transition: transform 0.3s;
+        }}
+        
+        .metric-card:hover {{
+            transform: translateY(-5px);
         }}
         
         .metric-value {{
             font-size: 2rem;
             font-weight: bold;
             margin-top: 10px;
+            color: #C0C0C0;
         }}
         
         /* Form */
@@ -395,27 +420,29 @@ def get_html_content(active_page="dashboard"):
         label {{
             display: block;
             margin-bottom: 8px;
-            color: #D4AF37;
+            color: #C0C0C0;
             font-weight: bold;
         }}
         
         input, select {{
             width: 100%;
             padding: 12px;
-            background: #3C3C3C;
-            border: 2px solid #D4AF37;
+            background: #2a2a2a;
+            border: 2px solid #C0C0C0;
             border-radius: 10px;
             color: white;
             font-size: 16px;
+            transition: all 0.3s;
         }}
         
         input:focus, select:focus {{
             outline: none;
             border-color: #8B0000;
+            background: #1a1a1a;
         }}
         
         button {{
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             color: white;
             border: none;
             padding: 12px 24px;
@@ -424,6 +451,12 @@ def get_html_content(active_page="dashboard"):
             font-weight: bold;
             cursor: pointer;
             width: 100%;
+            transition: all 0.3s;
+        }}
+        
+        button:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139,0,0,0.3);
         }}
         
         button:active {{
@@ -439,8 +472,8 @@ def get_html_content(active_page="dashboard"):
         }}
         
         .service-item {{
-            background: #2C2C2C;
-            border: 2px solid #D4AF37;
+            background: #2a2a2a;
+            border: 2px solid #C0C0C0;
             border-radius: 12px;
             padding: 15px;
             cursor: pointer;
@@ -449,12 +482,23 @@ def get_html_content(active_page="dashboard"):
             transition: all 0.3s;
         }}
         
+        .service-item:hover {{
+            transform: translateY(-3px);
+            border-color: #8B0000;
+        }}
+        
         .service-item.selected {{
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
+            border-color: #C0C0C0;
+        }}
+        
+        .service-name {{
+            font-weight: bold;
+            margin-bottom: 5px;
         }}
         
         .service-price {{
-            color: #D4AF37;
+            color: #C0C0C0;
             font-weight: bold;
             margin-top: 5px;
         }}
@@ -479,13 +523,18 @@ def get_html_content(active_page="dashboard"):
         .data-table th, .data-table td {{
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #D4AF37;
+            border-bottom: 1px solid #C0C0C0;
             color: white;
         }}
         
         .data-table th {{
-            color: #D4AF37;
+            color: #C0C0C0;
             font-weight: bold;
+            background: rgba(139,0,0,0.3);
+        }}
+        
+        .data-table tr:hover {{
+            background: rgba(139,0,0,0.2);
         }}
         
         /* Messages */
@@ -514,6 +563,7 @@ def get_html_content(active_page="dashboard"):
             border-radius: 5px;
             font-size: 12px;
             display: inline-block;
+            font-weight: bold;
         }}
         
         .status-pendente {{ background: #FFC107; color: #000; }}
@@ -521,19 +571,63 @@ def get_html_content(active_page="dashboard"):
         .status-concluido {{ background: #17A2B8; color: #fff; }}
         .status-cancelado {{ background: #DC3545; color: #fff; }}
         
+        /* Action buttons */
+        .action-btn {{
+            padding: 4px 8px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }}
+        
+        .btn-confirm {{
+            background: #28A745;
+            color: white;
+        }}
+        
+        .btn-cancel {{
+            background: #DC3545;
+            color: white;
+        }}
+        
         /* Footer */
         .footer {{
             text-align: center;
             padding: 20px;
-            color: #D4AF37;
+            color: #C0C0C0;
             font-size: 12px;
+            border-top: 1px solid #C0C0C0;
+            margin-top: 20px;
+        }}
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {{
+            width: 8px;
+            height: 8px;
+        }}
+        
+        ::-webkit-scrollbar-track {{
+            background: #1a1a1a;
+        }}
+        
+        ::-webkit-scrollbar-thumb {{
+            background: #8B0000;
+            border-radius: 4px;
+        }}
+        
+        ::-webkit-scrollbar-thumb:hover {{
+            background: #C0C0C0;
         }}
     </style>
 </head>
 <body>
     <div class="top-nav">
         <div class="nav-container">
-            <a href="#" onclick="showPage('dashboard')" class="logo">💈 Barber <span>Club PRO</span></a>
+            <a href="#" onclick="showPage('dashboard')" class="logo">
+                <span class="logo-icon">💈</span>
+                <span class="logo-text">Barbearia <span>Du Cortz</span></span>
+            </a>
             <div class="nav-links">
                 <button class="nav-btn" onclick="showPage('dashboard')">🏠 Dashboard</button>
                 <button class="nav-btn" onclick="showPage('agendamento')">📅 Agendar</button>
@@ -581,15 +675,15 @@ def get_html_content(active_page="dashboard"):
         <!-- Agendamento Page -->
         <div id="agendamento-page" class="page" style="display:none;">
             <div class="card">
-                <div class="card-title">📅 Novo Agendamento</div>
+                <div class="card-title">✂️ Novo Agendamento - Barbearia Du Cortz</div>
                 <form id="agendamento-form">
                     <div class="form-group">
                         <label>👤 Nome Completo *</label>
-                        <input type="text" id="nome" required>
+                        <input type="text" id="nome" placeholder="Digite seu nome completo" required>
                     </div>
                     <div class="form-group">
                         <label>📧 E-mail</label>
-                        <input type="email" id="email">
+                        <input type="email" id="email" placeholder="seuemail@exemplo.com">
                     </div>
                     <div class="form-group">
                         <label>📱 WhatsApp</label>
@@ -600,11 +694,11 @@ def get_html_content(active_page="dashboard"):
                         <input type="datetime-local" id="horario" required>
                     </div>
                     <div class="form-group">
-                        <label>✂️ Serviços *</label>
+                        <label>✂️ Selecione os Serviços *</label>
                         <div class="services-grid" id="services-grid"></div>
                     </div>
                     <div class="form-group" style="text-align: center;">
-                        <div style="font-size: 1.2rem;">💰 Total: <strong id="total-valor">R$ 0,00</strong></div>
+                        <div style="font-size: 1.2rem;">💰 <strong>Total:</strong> <strong id="total-valor" style="color: #C0C0C0;">R$ 0,00</strong></div>
                     </div>
                     <button type="submit">✅ Confirmar Agendamento</button>
                 </form>
@@ -615,14 +709,16 @@ def get_html_content(active_page="dashboard"):
         <!-- Lista Page -->
         <div id="lista-page" class="page" style="display:none;">
             <div class="card">
-                <div class="card-title">📋 Agendamentos</div>
-                <select id="status-filtro" style="margin-bottom: 15px; width: auto; display: inline-block;">
-                    <option value="todos">Todos</option>
-                    <option value="pendente">Pendentes</option>
-                    <option value="confirmado">Confirmados</option>
-                    <option value="concluido">Concluídos</option>
-                    <option value="cancelado">Cancelados</option>
-                </select>
+                <div class="card-title">📋 Lista de Agendamentos</div>
+                <div style="margin-bottom: 15px;">
+                    <select id="status-filtro" style="width: auto; display: inline-block; background: #2a2a2a; color: white; border: 1px solid #C0C0C0;">
+                        <option value="todos">📌 Todos</option>
+                        <option value="pendente">🟡 Pendentes</option>
+                        <option value="confirmado">🟢 Confirmados</option>
+                        <option value="concluido">🔵 Concluídos</option>
+                        <option value="cancelado">🔴 Cancelados</option>
+                    </select>
+                </div>
                 <div class="data-table" id="agendamentos-table"></div>
             </div>
         </div>
@@ -630,7 +726,7 @@ def get_html_content(active_page="dashboard"):
         <!-- Clientes Page -->
         <div id="clientes-page" class="page" style="display:none;">
             <div class="card">
-                <div class="card-title">👥 Clientes</div>
+                <div class="card-title">👥 Nossos Clientes</div>
                 <div class="data-table" id="clientes-table"></div>
             </div>
         </div>
@@ -639,15 +735,15 @@ def get_html_content(active_page="dashboard"):
         <div id="financeiro-page" class="page" style="display:none;">
             <div class="grid-2">
                 <div class="card">
-                    <div class="card-title">📝 Nova Despesa</div>
+                    <div class="card-title">📝 Lançar Despesa</div>
                     <form id="despesa-form">
                         <div class="form-group">
                             <label>Descrição</label>
-                            <input type="text" id="descricao" required>
+                            <input type="text" id="descricao" placeholder="Ex: Compra de produtos" required>
                         </div>
                         <div class="form-group">
                             <label>Valor</label>
-                            <input type="number" id="valor-despesa" step="0.01" required>
+                            <input type="number" id="valor-despesa" step="0.01" placeholder="0,00" required>
                         </div>
                         <div class="form-group">
                             <label>Categoria</label>
@@ -664,7 +760,7 @@ def get_html_content(active_page="dashboard"):
                             <label>Data</label>
                             <input type="date" id="data-despesa" required>
                         </div>
-                        <button type="submit">Lançar Despesa</button>
+                        <button type="submit">💰 Lançar Despesa</button>
                     </form>
                     <div id="despesa-message" class="message"></div>
                 </div>
@@ -681,7 +777,7 @@ def get_html_content(active_page="dashboard"):
     </div>
     
     <div class="footer">
-        <p>💈 Barber Club PRO - Sistema de Gestão Profissional</p>
+        <p>💈 Barbearia Du Cortz - Tradição e Estilo</p>
         <p>© 2024 - Todos os direitos reservados</p>
     </div>
     
@@ -793,8 +889,8 @@ def get_html_content(active_page="dashboard"):
                     <td><span class="status status-${{a[13]}}">${{a[13]}}</span></td>
                     <td>`;
                 if (a[13] === 'pendente') {{
-                    html += `<button onclick="updateStatus(${{a[0]}}, 'confirmado')" style="background:#28A745; padding:4px 8px; margin-right:5px;">Confirmar</button>`;
-                    html += `<button onclick="updateStatus(${{a[0]}}, 'cancelado')" style="background:#DC3545; padding:4px 8px;">Cancelar</button>`;
+                    html += `<button class="action-btn btn-confirm" onclick="updateStatus(${{a[0]}}, 'confirmado')">✅ Confirmar</button>`;
+                    html += `<button class="action-btn btn-cancel" onclick="updateStatus(${{a[0]}}, 'cancelado')">❌ Cancelar</button>`;
                 }}
                 html += `</td></tr>`;
             }});
@@ -809,6 +905,7 @@ def get_html_content(active_page="dashboard"):
                 body: JSON.stringify({{id, status}})
             }});
             loadAgendamentos();
+            loadDashboard();
         }}
         
         async function loadClientes() {{
@@ -820,10 +917,10 @@ def get_html_content(active_page="dashboard"):
             let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Total Gasto</th><th>Última Visita</th></tr></thead><tbody>';
             clientes.forEach(c => {{
                 html += `<tr>
-                    <td>${{c[1]}}</td>
+                    <td><strong>${{c[1]}}</strong></td>
                     <td>${{c[2] || '-'}}</td>
                     <td>${{c[3] || '-'}}</td>
-                    <td>R$ ${{(c[5] || 0).toFixed(2)}}</td>
+                    <td><span style="color: #C0C0C0;">R$ ${{(c[5] || 0).toFixed(2)}}</span></td>
                     <td>${{c[6] ? new Date(c[6]).toLocaleDateString('pt-BR') : '-'}}</td>
                 </tr>`;
             }});
@@ -840,16 +937,22 @@ def get_html_content(active_page="dashboard"):
             const lucro = receita - despesaTotal;
             
             document.getElementById('resumo-financeiro').innerHTML = `
-                <div style="margin-bottom:15px;"><strong>💰 Receita Total:</strong> R$ ${{receita.toFixed(2)}}</div>
-                <div style="margin-bottom:15px;"><strong>📉 Despesas Totais:</strong> R$ ${{despesaTotal.toFixed(2)}}</div>
-                <div><strong>📈 Lucro Líquido:</strong> R$ ${{lucro.toFixed(2)}}</div>
+                <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
+                    <div><strong>💰 Receita Total:</strong> <span style="color: #C0C0C0;">R$ ${{receita.toFixed(2)}}</span></div>
+                </div>
+                <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
+                    <div><strong>📉 Despesas Totais:</strong> <span style="color: #C0C0C0;">R$ ${{despesaTotal.toFixed(2)}}</span></div>
+                </div>
+                <div style="padding:10px; background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%); border-radius:8px;">
+                    <div><strong>📈 Lucro Líquido:</strong> <span style="color: #C0C0C0;">R$ ${{lucro.toFixed(2)}}</span></div>
+                </div>
             `;
             
             let html = '<table><thead><tr><th>Descrição</th><th>Valor</th><th>Categoria</th><th>Data</th></tr></thead><tbody>';
             despesas.forEach(d => {{
-                html += `<tr>
+                html += `什
                     <td>${{d[1]}}</td>
-                    <td>R$ ${{d[2].toFixed(2)}}</td>
+                    <td><span style="color: #C0C0C0;">R$ ${{d[2].toFixed(2)}}</span></td>
                     <td>${{d[3]}}</td>
                     <td>${{new Date(d[4]).toLocaleDateString('pt-BR')}}</td>
                 </tr>`;
@@ -867,7 +970,7 @@ def get_html_content(active_page="dashboard"):
             
             if (!nome || !horario || servicosSelecionados.size === 0) {{
                 const msg = document.getElementById('agendamento-message');
-                msg.textContent = 'Preencha todos os campos obrigatórios e selecione pelo menos um serviço!';
+                msg.textContent = '❌ Preencha todos os campos obrigatórios e selecione pelo menos um serviço!';
                 msg.className = 'message error';
                 setTimeout(() => msg.style.display = 'none', 3000);
                 return;
@@ -898,7 +1001,7 @@ def get_html_content(active_page="dashboard"):
             const result = await response.json();
             const msg = document.getElementById('agendamento-message');
             if (result.success) {{
-                msg.textContent = '✅ Agendamento realizado com sucesso!';
+                msg.textContent = '✅ Agendamento realizado com sucesso! Redirecionando...';
                 msg.className = 'message success';
                 document.getElementById('agendamento-form').reset();
                 servicosSelecionados.clear();
