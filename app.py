@@ -140,7 +140,6 @@ class Database:
     def inserir_agendamento(self, dados):
         cursor = self.conn.cursor()
         
-        # Verificar se cliente existe
         cursor.execute('SELECT id FROM clientes WHERE nome = ?', (dados['nome'],))
         cliente = cursor.fetchone()
         
@@ -157,7 +156,6 @@ class Database:
                 VALUES (?, ?, ?, ?, ?)
             ''', (dados['nome'], dados.get('email', ''), dados.get('telefone', ''), dados['valor_total'], dados['data_horario']))
         
-        # Inserir agendamento
         cursor.execute('''
             INSERT INTO agendamentos (
                 nome, email, telefone, data_horario, servicos, valor_total,
@@ -229,7 +227,6 @@ class Database:
             'concluidos': concluidos
         }
 
-# Inicializar banco de dados
 db = Database()
 
 # ==================== API ROTAS ====================
@@ -246,7 +243,6 @@ def process_api():
         elif path == 'agendamentos':
             status = query_params.get('status', [None])[0]
             agendamentos = db.listar_agendamentos(status if status else None)
-            # Converter para lista serializável
             result = []
             for a in agendamentos:
                 result.append(list(a))
@@ -270,7 +266,6 @@ def process_api():
             st.stop()
         
         elif path == 'agendar':
-            # Pegar dados do POST via query params
             data_str = query_params.get('data', ['{}'])[0]
             dados = json.loads(data_str)
             db.inserir_agendamento(dados)
@@ -291,7 +286,7 @@ def process_api():
             st.json({'success': True, 'message': 'Despesa lançada!'})
             st.stop()
 
-# ==================== HTML COMPLETO COM JAVASCRIPT CORRIGIDO ====================
+# ==================== HTML COMPLETO COM IMAGEM DE FUNDO ====================
 HTML_TEMPLATE = '''<!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -307,18 +302,44 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             min-height: 100vh;
+            position: relative;
+            background: #0a0a0a;
         }
         
+        /* Imagem de fundo com opacidade */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('barber2.webp'), url('barber1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+        
+        /* Fallback se as imagens não carregarem */
+        @media (max-width: 768px) {
+            body::before {
+                background-size: cover;
+                background-position: center;
+            }
+        }
+        
+        /* Top Navigation - Gradiente mais vibrante */
         .top-nav {
-            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
+            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 50%, #4a0a0a 100%);
             padding: 12px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            border-bottom: 2px solid #C0C0C0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border-bottom: 2px solid #FFD700;
         }
         
         .nav-container {
@@ -339,29 +360,44 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
-        .logo-icon { font-size: 2rem; }
-        .logo-text { background: linear-gradient(135deg, #C0C0C0 0%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .logo span { color: #C0C0C0; }
+        .logo-icon { font-size: 2rem; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logo-text { 
+            background: linear-gradient(135deg, #FFD700 0%, #FFFFFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+        .logo span { color: #FFD700; }
         
         .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
         
         .nav-btn {
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: 1px solid #C0C0C0;
+            background: rgba(0,0,0,0.6);
+            color: #FFD700;
+            border: 1px solid #FFD700;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: bold;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
         }
         
         .nav-btn:hover, .nav-btn.active {
-            background: #8B0000;
-            border-color: #C0C0C0;
+            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
+            color: white;
+            border-color: white;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
         }
         
         @media (max-width: 768px) {
@@ -372,22 +408,32 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         
         .main-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
+        /* Cards com vidro fosco (glassmorphism) */
         .card {
-            background: rgba(0,0,0,0.85);
-            border-radius: 15px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid #C0C0C0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(212,175,55,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(212,175,55,0.2);
+            border-color: rgba(212,175,55,0.6);
         }
         
         .card-title {
-            color: #C0C0C0;
+            color: #FFD700;
             font-size: 1.2rem;
             margin-bottom: 15px;
             font-weight: bold;
-            border-left: 4px solid #8B0000;
+            border-left: 4px solid #FFD700;
             padding-left: 12px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
         
         .grid-2, .grid-3, .grid-4 { display: grid; gap: 20px; margin-bottom: 20px; }
@@ -399,53 +445,65 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
         }
         
+        /* Metric Cards com efeito brilho */
         .metric-card {
-            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(212,175,55,0.9) 100%);
+            border-radius: 20px;
             padding: 20px;
             text-align: center;
             color: white;
-            border: 1px solid #C0C0C0;
-            transition: transform 0.3s;
+            border: 1px solid #FFD700;
+            transition: all 0.3s;
             cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         
-        .metric-card:hover { transform: translateY(-5px); }
-        .metric-value { font-size: 2rem; font-weight: bold; margin-top: 10px; color: #C0C0C0; }
+        .metric-card:hover { 
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(212,175,55,0.4);
+        }
+        .metric-value { font-size: 2rem; font-weight: bold; margin-top: 10px; color: #FFD700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #C0C0C0; font-weight: bold; }
+        label { display: block; margin-bottom: 8px; color: #FFD700; font-weight: bold; text-shadow: 1px 1px 1px rgba(0,0,0,0.5); }
         
         input, select {
             width: 100%;
             padding: 12px;
-            background: #2a2a2a;
-            border: 2px solid #C0C0C0;
-            border-radius: 10px;
+            background: rgba(42,42,42,0.9);
+            border: 2px solid #FFD700;
+            border-radius: 12px;
             color: white;
             font-size: 16px;
+            transition: all 0.3s;
         }
         
         input:focus, select:focus {
             outline: none;
-            border-color: #8B0000;
-            background: #1a1a1a;
+            border-color: #D4AF37;
+            background: rgba(0,0,0,0.9);
+            box-shadow: 0 0 10px rgba(212,175,55,0.5);
         }
         
         button {
-            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
+            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
             transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
-        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139,0,0,0.3); }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+        }
         
         .services-grid {
             display: grid;
@@ -455,37 +513,47 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         }
         
         .service-item {
-            background: #2a2a2a;
-            border: 2px solid #C0C0C0;
+            background: rgba(42,42,42,0.9);
+            border: 2px solid #FFD700;
             border-radius: 12px;
             padding: 15px;
             cursor: pointer;
             text-align: center;
             color: white;
             transition: all 0.3s;
+            backdrop-filter: blur(5px);
         }
         
-        .service-item:hover { transform: translateY(-3px); border-color: #8B0000; }
-        .service-item.selected { background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%); border-color: #C0C0C0; }
-        .service-name { font-weight: bold; margin-bottom: 5px; }
-        .service-price { color: #C0C0C0; font-weight: bold; margin-top: 5px; }
+        .service-item:hover { 
+            transform: translateY(-3px); 
+            border-color: #D4AF37;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+        }
+        .service-item.selected { 
+            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(212,175,55,0.5);
+        }
+        .service-name { font-weight: bold; margin-bottom: 5px; font-size: 1rem; }
+        .service-price { color: #FFD700; font-weight: bold; margin-top: 5px; }
         .service-item.selected .service-price { color: white; }
         
         .data-table {
             width: 100%;
             background: rgba(0,0,0,0.7);
-            border-radius: 10px;
+            border-radius: 12px;
             overflow-x: auto;
+            backdrop-filter: blur(5px);
         }
         
         .data-table table { width: 100%; border-collapse: collapse; }
-        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #C0C0C0; color: white; }
-        .data-table th { color: #C0C0C0; font-weight: bold; background: rgba(139,0,0,0.3); }
-        .data-table tr:hover { background: rgba(139,0,0,0.2); }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(212,175,55,0.3); color: white; }
+        .data-table th { color: #FFD700; font-weight: bold; background: rgba(139,0,0,0.4); }
+        .data-table tr:hover { background: rgba(212,175,55,0.1); }
         
         .status {
             padding: 4px 8px;
-            border-radius: 5px;
+            border-radius: 20px;
             font-size: 12px;
             display: inline-block;
             font-weight: bold;
@@ -519,15 +587,34 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         .footer {
             text-align: center;
             padding: 20px;
-            color: #C0C0C0;
+            color: #FFD700;
             font-size: 12px;
-            border-top: 1px solid #C0C0C0;
+            border-top: 1px solid rgba(212,175,55,0.3);
             margin-top: 20px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
         }
         
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        
+        /* Animações */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .page {
+            animation: fadeInUp 0.5s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -562,7 +649,9 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             </div>
             <div class="card">
                 <div class="card-title">📅 Próximos Agendamentos</div>
-                <div class="data-table"><table><thead><tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th></tr></thead><tbody id="proximos-tbody"></tbody></table></div>
+                <div class="data-table">\\\\(\\\\(<thead>\\\\
+                    <th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th>\\\\
+                </thead><tbody id="proximos-tbody"></tbody>\\\\)\\\\)</div>
             </div>
         </div>
         
@@ -575,7 +664,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                     <div class="form-group"><label>📱 WhatsApp</label><input type="tel" id="telefone" placeholder="(11) 99999-9999"></div>
                     <div class="form-group"><label>🕐 Data e Horário *</label><input type="datetime-local" id="horario" required></div>
                     <div class="form-group"><label>✂️ Selecione os Serviços *</label><div class="services-grid" id="services-grid"></div></div>
-                    <div class="form-group" style="text-align: center;"><div style="font-size: 1.2rem;">💰 <strong>Total:</strong> <strong id="total-valor" style="color: #C0C0C0;">R$ 0,00</strong></div></div>
+                    <div class="form-group" style="text-align: center;"><div style="font-size: 1.2rem;">💰 <strong>Total:</strong> <strong id="total-valor" style="color: #FFD700;">R$ 0,00</strong></div></div>
                     <button type="submit">✅ Confirmar Agendamento</button>
                 </form>
                 <div id="agendamento-message" class="message"></div>
@@ -585,7 +674,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         <div id="lista-page" class="page" style="display:none;">
             <div class="card">
                 <div class="card-title">📋 Lista de Agendamentos</div>
-                <div style="margin-bottom: 15px;"><select id="status-filtro" style="width: auto; display: inline-block; background: #2a2a2a; color: white; border: 1px solid #C0C0C0;"><option value="todos">📌 Todos</option><option value="pendente">🟡 Pendentes</option><option value="confirmado">🟢 Confirmados</option><option value="concluido">🔵 Concluídos</option><option value="cancelado">🔴 Cancelados</option></select></div>
+                <div style="margin-bottom: 15px;"><select id="status-filtro" style="width: auto; display: inline-block; background: #2a2a2a; color: white; border: 1px solid #FFD700;"><option value="todos">📌 Todos</option><option value="pendente">🟡 Pendentes</option><option value="confirmado">🟢 Confirmados</option><option value="concluido">🔵 Concluídos</option><option value="cancelado">🔴 Cancelados</option></select></div>
                 <div class="data-table" id="agendamentos-table"></div>
             </div>
         </div>
@@ -612,7 +701,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         </div>
     </div>
     
-    <div class="footer"><p>💈 Barbearia Du Cortz - Tradição e Estilo</p><p>© 2024 - Todos os direitos reservados</p></div>
+    <div class="footer"><p>💈 Barbearia Du Cortz - Tradição, Estilo e Elegância</p><p>© 2024 - Todos os direitos reservados</p></div>
     
     <script>
         let servicosSelecionados = new Map();
@@ -766,7 +855,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                         <td><strong>${c[1]}</strong></td>
                         <td>${c[2] || '-'}</td>
                         <td>${c[3] || '-'}</td>
-                        <td><span style="color: #C0C0C0;">R$ ${(c[5] || 0).toFixed(2)}</span></td>
+                        <td><span style="color: #FFD700;">R$ ${(c[5] || 0).toFixed(2)}</span></td>
                         <td>${c[6] ? new Date(c[6]).toLocaleDateString('pt-BR') : '-'}</td>
                     </tr>`;
                 });
@@ -784,14 +873,14 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 const lucro = receita - despesaTotal;
                 
                 document.getElementById('resumo-financeiro').innerHTML = `
-                    <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
-                        <div><strong>💰 Receita Total:</strong> <span style="color: #C0C0C0;">R$ ${receita.toFixed(2)}</span></div>
+                    <div style="margin-bottom:15px; padding:10px; background: rgba(42,42,42,0.8); border-radius:12px;">
+                        <div><strong>💰 Receita Total:</strong> <span style="color: #FFD700;">R$ ${receita.toFixed(2)}</span></div>
                     </div>
-                    <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
-                        <div><strong>📉 Despesas Totais:</strong> <span style="color: #C0C0C0;">R$ ${despesaTotal.toFixed(2)}</span></div>
+                    <div style="margin-bottom:15px; padding:10px; background: rgba(42,42,42,0.8); border-radius:12px;">
+                        <div><strong>📉 Despesas Totais:</strong> <span style="color: #FFD700;">R$ ${despesaTotal.toFixed(2)}</span></div>
                     </div>
-                    <div style="padding:10px; background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%); border-radius:8px;">
-                        <div><strong>📈 Lucro Líquido:</strong> <span style="color: #C0C0C0;">R$ ${lucro.toFixed(2)}</span></div>
+                    <div style="padding:10px; background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%); border-radius:12px;">
+                        <div><strong>📈 Lucro Líquido:</strong> <span style="color: #FFD700;">R$ ${lucro.toFixed(2)}</span></div>
                     </div>
                 `;
                 
@@ -799,7 +888,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 despesas.forEach(d => {
                     html += `<tr>
                         <td>${d[1]}</td>
-                        <td><span style="color: #C0C0C0;">R$ ${d[2].toFixed(2)}</span></td>
+                        <td><span style="color: #FFD700;">R$ ${d[2].toFixed(2)}</span></td>
                         <td>${d[3]}</td>
                         <td>${new Date(d[4]).toLocaleDateString('pt-BR')}</td>
                     </tr>`;
@@ -894,8 +983,5 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 </html>'''
 
 # ==================== MAIN ====================
-# Processar requisições API
 process_api()
-
-# Exibir o HTML
 st.components.v1.html(HTML_TEMPLATE, height=800, scrolling=True)
