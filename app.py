@@ -6,14 +6,9 @@ import os
 import json
 import hashlib
 from datetime import datetime, timedelta
-import plotly.graph_objects as go
-import plotly.express as px
-from PIL import Image
 import base64
-import random
-import string
 
-# Configuração da página
+# Configuração da página MUST BE FIRST
 st.set_page_config(
     page_title="Barber Club PRO - Sistema de Gestão",
     page_icon="💈",
@@ -35,12 +30,31 @@ CORES = {
     "danger": "#DC3545"         # Vermelho
 }
 
-# Estilo personalizado profissional
+# CSS Responsivo para Celular e Desktop
 st.markdown(f"""
     <style>
     /* Reset e estilos globais */
     .stApp {{
         background: linear-gradient(135deg, {CORES['dark']} 0%, {CORES['medium']} 100%);
+    }}
+    
+    /* Responsividade para celular */
+    @media (max-width: 768px) {{
+        .stApp {{
+            padding: 0px;
+        }}
+        .main .block-container {{
+            padding: 1rem;
+        }}
+        h1 {{
+            font-size: 1.8rem !important;
+        }}
+        h2 {{
+            font-size: 1.4rem !important;
+        }}
+        .stMetric {{
+            margin-bottom: 0.5rem;
+        }}
     }}
     
     /* Cards premium */
@@ -78,6 +92,7 @@ st.markdown(f"""
         padding: 10px 25px;
         font-weight: bold;
         transition: all 0.3s;
+        width: 100%;
     }}
     
     .stButton > button:hover {{
@@ -93,28 +108,70 @@ st.markdown(f"""
         font-weight: bold;
     }}
     
-    /* Sidebar */
+    /* Sidebar responsiva */
     .css-1d391kg {{
         background: linear-gradient(180deg, {CORES['dark']} 0%, {CORES['medium']} 100%);
     }}
     
-    /* Tabelas */
-    .dataframe {{
-        background: rgba(0,0,0,0.7);
-        border-radius: 10px;
-        color: white;
+    @media (max-width: 768px) {{
+        .css-1d391kg {{
+            width: 250px;
+        }}
     }}
     
     /* Inputs */
     .stTextInput > div > div > input,
     .stNumberInput > div > div > input,
-    .stSelectbox > div > div {{
+    .stSelectbox > div > div,
+    .stDateInput > div > div > input {{
         background-color: {CORES['light']};
         color: white;
         border: 1px solid {CORES['secondary']};
+        border-radius: 10px;
     }}
     
-    /* Animação */
+    /* Tabelas responsivas */
+    .dataframe {{
+        background: rgba(0,0,0,0.7);
+        border-radius: 10px;
+        color: white;
+        overflow-x: auto;
+        font-size: 14px;
+    }}
+    
+    @media (max-width: 768px) {{
+        .dataframe {{
+            font-size: 12px;
+        }}
+        .dataframe td, .dataframe th {{
+            padding: 8px 4px;
+        }}
+    }}
+    
+    /* Tabs responsivas */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 8px;
+        flex-wrap: wrap;
+    }}
+    
+    .stTabs [data-baseweb="tab"] {{
+        padding: 8px 16px;
+        font-size: 14px;
+    }}
+    
+    @media (max-width: 768px) {{
+        .stTabs [data-baseweb="tab"] {{
+            padding: 6px 12px;
+            font-size: 12px;
+        }}
+    }}
+    
+    /* Mensagens */
+    .stAlert {{
+        border-radius: 10px;
+    }}
+    
+    /* Animações */
     @keyframes fadeIn {{
         from {{ opacity: 0; transform: translateY(20px); }}
         to {{ opacity: 1; transform: translateY(0); }}
@@ -155,8 +212,7 @@ class Database:
                 status TEXT DEFAULT 'pendente',
                 observacoes TEXT,
                 data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-                confirmado INTEGER DEFAULT 0,
-                FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+                confirmado INTEGER DEFAULT 0
             )
         ''')
         
@@ -250,13 +306,13 @@ class Database:
                 UPDATE clientes 
                 SET email = ?, telefone = ?, total_gasto = total_gasto + ?, ultima_visita = ?
                 WHERE id = ?
-            ''', (dados.get('email', ''), dados.get('telefone', ''), dados['valor_total'], dados['data_agendamento'], cliente_id))
+            ''', (dados.get('email', ''), dados.get('telefone', ''), dados['valor_total'], dados['data_horario'], cliente_id))
         else:
             # Criar novo cliente
             cursor.execute('''
                 INSERT INTO clientes (nome, email, telefone, total_gasto, ultima_visita)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (dados['nome'], dados.get('email', ''), dados.get('telefone', ''), dados['valor_total'], dados['data_agendamento']))
+            ''', (dados['nome'], dados.get('email', ''), dados.get('telefone', ''), dados['valor_total'], dados['data_horario']))
             cliente_id = cursor.lastrowid
         
         # Inserir agendamento
@@ -367,7 +423,7 @@ class Database:
 # Inicializar banco de dados
 db = Database()
 
-# ==================== FUNÇÃO DO HTML ====================
+# ==================== FUNÇÃO DO HTML RESPONSIVO ====================
 def criar_arquivo_html():
     html_path = "agendamento.html"
     
@@ -375,7 +431,7 @@ def criar_arquivo_html():
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Barber Club PRO - Agendamento</title>
     <style>
         * {{
@@ -385,14 +441,14 @@ def criar_arquivo_html():
         }}
 
         body {{
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #1C1C1C 0%, #2C2C2C 100%);
-            padding: 20px;
+            padding: 16px;
             min-height: 100vh;
         }}
 
         .container {{
-            max-width: 1000px;
+            max-width: 500px;
             margin: 0 auto;
             background: rgba(0,0,0,0.9);
             border-radius: 20px;
@@ -401,38 +457,62 @@ def criar_arquivo_html():
             border: 1px solid #D4AF37;
         }}
 
+        @media (min-width: 768px) {{
+            .container {{
+                max-width: 800px;
+            }}
+            body {{
+                padding: 40px;
+            }}
+        }}
+
         .header {{
             background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
             color: white;
-            padding: 50px 30px;
+            padding: 30px 20px;
             text-align: center;
-            position: relative;
         }}
 
         .header h1 {{
-            font-size: 3.5em;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
             font-weight: 800;
         }}
 
         .header p {{
-            font-size: 1.2em;
+            font-size: 0.9rem;
             opacity: 0.95;
         }}
 
+        @media (min-width: 768px) {{
+            .header h1 {{
+                font-size: 2.5rem;
+            }}
+            .header p {{
+                font-size: 1rem;
+            }}
+        }}
+
         .form-content {{
-            padding: 40px;
+            padding: 20px;
+        }}
+
+        @media (min-width: 768px) {{
+            .form-content {{
+                padding: 30px;
+            }}
         }}
 
         .form-group {{
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }}
 
         label {{
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: #D4AF37;
+            font-size: 0.9rem;
         }}
 
         input, select {{
@@ -444,6 +524,7 @@ def criar_arquivo_html():
             font-size: 16px;
             transition: all 0.3s;
             color: white;
+            -webkit-appearance: none;
         }}
 
         input:focus, select:focus {{
@@ -454,25 +535,30 @@ def criar_arquivo_html():
 
         .servicos-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }}
+
+        @media (min-width: 768px) {{
+            .servicos-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
         }}
 
         .servico-item {{
             background: #2C2C2C;
             border: 2px solid #D4AF37;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
             color: white;
         }}
 
-        .servico-item:hover {{
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            border-color: #8B0000;
+        .servico-item:active {{
+            transform: scale(0.98);
         }}
 
         .servico-item.selected {{
@@ -483,12 +569,12 @@ def criar_arquivo_html():
 
         .servico-nome {{
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1rem;
             margin-bottom: 5px;
         }}
 
         .servico-preco {{
-            font-size: 1.3em;
+            font-size: 1.2rem;
             color: #D4AF37;
             font-weight: bold;
         }}
@@ -499,17 +585,23 @@ def criar_arquivo_html():
 
         .total-section {{
             background: linear-gradient(135deg, #2C2C2C 0%, #1C1C1C 100%);
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
-            margin: 25px 0;
+            margin: 20px 0;
             text-align: center;
             border: 1px solid #D4AF37;
         }}
 
         .total-value {{
-            font-size: 3em;
+            font-size: 2rem;
             color: #D4AF37;
             font-weight: bold;
+        }}
+
+        @media (min-width: 768px) {{
+            .total-value {{
+                font-size: 2.5rem;
+            }}
         }}
 
         button {{
@@ -519,22 +611,24 @@ def criar_arquivo_html():
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
         }}
 
-        button:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(139,0,0,0.4);
+        button:active {{
+            transform: scale(0.98);
         }}
 
         .message {{
             margin-top: 20px;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             display: none;
+            text-align: center;
+            font-size: 14px;
         }}
 
         .message.success {{
@@ -554,32 +648,32 @@ def criar_arquivo_html():
     <div class="container">
         <div class="header">
             <h1>💈 Barber Club PRO</h1>
-            <p>Agendamento Premium - Sistema de Gestão Profissional</p>
+            <p>Agendamento Premium</p>
         </div>
         
         <div class="form-content">
             <div class="form-group">
-                <label>👤 Seu Nome:</label>
+                <label>👤 Seu Nome *</label>
                 <input type="text" id="nome" placeholder="Digite seu nome completo" required>
             </div>
             
             <div class="form-group">
-                <label>📧 E-mail:</label>
+                <label>📧 E-mail</label>
                 <input type="email" id="email" placeholder="seuemail@exemplo.com">
             </div>
             
             <div class="form-group">
-                <label>📱 WhatsApp:</label>
+                <label>📱 WhatsApp</label>
                 <input type="tel" id="telefone" placeholder="(11) 99999-9999">
             </div>
 
             <div class="form-group">
-                <label>🕐 Data e Horário:</label>
+                <label>🕐 Data e Horário *</label>
                 <input type="datetime-local" id="horario" required>
             </div>
 
             <div class="form-group">
-                <label>✂️ Selecione os Serviços:</label>
+                <label>✂️ Selecione os Serviços *</label>
                 <div class="servicos-grid">
                     <div class="servico-item" data-servico="corte_simples" data-preco="35">
                         <div class="servico-nome">✂️ Corte Simples</div>
@@ -623,7 +717,8 @@ def criar_arquivo_html():
         let servicosSelecionados = new Map();
 
         document.querySelectorAll('.servico-item').forEach(item => {{
-            item.addEventListener('click', function() {{
+            item.addEventListener('click', function(e) {{
+                e.preventDefault();
                 const servico = this.dataset.servico;
                 const preco = parseFloat(this.dataset.preco);
                 
@@ -735,7 +830,7 @@ with st.sidebar:
         <div style="text-align: center; padding: 20px;">
             <h1 style="font-size: 3em; color: {CORES['secondary']};">💈</h1>
             <h2 style="color: {CORES['secondary']};">Barber Club PRO</h2>
-            <p style="color: white;">Sistema de Gestão Profissional</p>
+            <p style="color: white;">Sistema de Gestão</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -743,42 +838,41 @@ with st.sidebar:
     
     # Menu Principal
     menu = st.radio(
-        "📋 MENU PRINCIPAL",
+        "📋 MENU",
         ["🏠 Dashboard", "📅 Agendamentos", "👥 Clientes", "💰 Financeiro", "📊 Relatórios", "⚙️ Configurações"],
         label_visibility="collapsed"
     )
     
     st.markdown("---")
     
-    # Informações da barbearia
-    st.markdown(f"<h3 style='color: {CORES['secondary']};'>📍 Informações</h3>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color: white;'>Av. Principal, 123<br>Centro, São Paulo - SP</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color: white;'>📞 (11) 99999-9999</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color: white;'>⏰ 09:00 às 20:00</p>", unsafe_allow_html=True)
+    # Informações
+    st.markdown(f"<h3 style='color: {CORES['secondary']}; font-size: 1rem;'>📍 Info</h3>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color: white; font-size: 0.8rem;'>Av. Principal, 123<br>SP - Brasil</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color: white; font-size: 0.8rem;'>📞 (11) 99999-9999</p>", unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Estatísticas rápidas
     stats = db.get_estatisticas()
-    st.markdown(f"<h3 style='color: {CORES['secondary']};'>📊 Hoje</h3>", unsafe_allow_html=True)
-    st.metric("Agendamentos Hoje", stats['agendamentos_hoje'])
-    st.metric("Receita Hoje", f"R$ {stats['receita_hoje']:.2f}")
+    st.markdown(f"<h3 style='color: {CORES['secondary']}; font-size: 1rem;'>📊 Hoje</h3>", unsafe_allow_html=True)
+    st.metric("Agendamentos", stats['agendamentos_hoje'])
+    st.metric("Receita", f"R$ {stats['receita_hoje']:.2f}")
 
 # ==================== DASHBOARD ====================
 if menu == "🏠 Dashboard":
-    st.title("💈 Dashboard Barber Club PRO")
+    st.title("💈 Dashboard")
     st.markdown("---")
     
     stats = db.get_estatisticas()
     
-    # Cards de métricas
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
+    col3, col4 = st.columns(2)
     
     with col1:
         st.markdown(f"""
             <div class="metric-premium">
-                <h3>Total Clientes</h3>
-                <h1 style="font-size: 2.5em;">{stats['total_clientes']}</h1>
+                <h3>Clientes</h3>
+                <h1 style="font-size: 2rem;">{stats['total_clientes']}</h1>
             </div>
         """, unsafe_allow_html=True)
     
@@ -786,7 +880,7 @@ if menu == "🏠 Dashboard":
         st.markdown(f"""
             <div class="metric-premium">
                 <h3>Agendamentos</h3>
-                <h1 style="font-size: 2.5em;">{stats['total_agendamentos']}</h1>
+                <h1 style="font-size: 2rem;">{stats['total_agendamentos']}</h1>
             </div>
         """, unsafe_allow_html=True)
     
@@ -794,7 +888,7 @@ if menu == "🏠 Dashboard":
         st.markdown(f"""
             <div class="metric-premium">
                 <h3>Receita Total</h3>
-                <h1 style="font-size: 2em;">R$ {stats['receita_total']:.2f}</h1>
+                <h1 style="font-size: 1.5rem;">R$ {stats['receita_total']:.2f}</h1>
             </div>
         """, unsafe_allow_html=True)
     
@@ -803,7 +897,7 @@ if menu == "🏠 Dashboard":
         st.markdown(f"""
             <div class="metric-premium">
                 <h3>Ticket Médio</h3>
-                <h1 style="font-size: 2em;">R$ {ticket_medio:.2f}</h1>
+                <h1 style="font-size: 1.5rem;">R$ {ticket_medio:.2f}</h1>
             </div>
         """, unsafe_allow_html=True)
     
@@ -818,14 +912,12 @@ if menu == "🏠 Dashboard":
     if proximos:
         for agendamento in proximos:
             with st.container():
-                col1, col2, col3, col4 = st.columns([2, 2, 3, 1])
+                col1, col2 = st.columns([3, 2])
                 with col1:
                     st.write(f"**👤 {agendamento[2]}**")
+                    st.write(f"✂️ {agendamento[6]}")
                 with col2:
                     st.write(f"📅 {datetime.fromisoformat(agendamento[5]).strftime('%d/%m/%Y %H:%M')}")
-                with col3:
-                    st.write(f"✂️ {agendamento[6]}")
-                with col4:
                     st.write(f"💰 R$ {agendamento[7]:.2f}")
                 st.markdown("---")
     else:
@@ -833,16 +925,16 @@ if menu == "🏠 Dashboard":
 
 # ==================== AGENDAMENTOS ====================
 elif menu == "📅 Agendamentos":
-    tab1, tab2, tab3 = st.tabs(["📅 Novo Agendamento", "📋 Lista de Agendamentos", "✅ Gerenciar Status"])
+    tab1, tab2 = st.tabs(["📅 Novo Agendamento", "📋 Lista"])
     
     with tab1:
-        st.header("📅 Novo Agendamento")
+        st.header("Novo Agendamento")
         
         html_path = criar_arquivo_html()
         if os.path.exists(html_path):
             with open(html_path, "r", encoding="utf-8") as f:
                 html_content = f.read()
-            st.components.v1.html(html_content, height=900, scrolling=True)
+            st.components.v1.html(html_content, height=700, scrolling=True)
             
             query_params = st.query_params
             if "dados_agendamento" in query_params:
@@ -854,33 +946,25 @@ elif menu == "📅 Agendamentos":
                     st.query_params.clear()
                     st.rerun()
                 except Exception as e:
-                    st.error(f"Erro ao processar: {e}")
+                    st.error(f"Erro: {e}")
     
     with tab2:
-        st.header("📋 Todos os Agendamentos")
+        st.header("Lista de Agendamentos")
         
-        # Filtros
-        col1, col2 = st.columns(2)
-        with col1:
-            status_filtro = st.selectbox("Status", ["Todos", "pendente", "confirmado", "concluido", "cancelado"])
-        with col2:
-            busca = st.text_input("Buscar por nome")
+        status_filtro = st.selectbox("Filtrar por Status", ["Todos", "pendente", "confirmado", "concluido", "cancelado"])
         
         agendamentos = db.listar_agendamentos(status_filtro if status_filtro != "Todos" else None)
         
         if agendamentos:
             for agendamento in agendamentos:
                 with st.container():
-                    col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
+                    col1, col2 = st.columns([2, 1])
                     with col1:
                         st.write(f"**👤 {agendamento[2]}**")
+                        st.write(f"✂️ {agendamento[6]}")
                     with col2:
                         st.write(f"📅 {datetime.fromisoformat(agendamento[5]).strftime('%d/%m/%Y %H:%M')}")
-                    with col3:
-                        st.write(f"✂️ {agendamento[6]}")
-                    with col4:
                         st.write(f"💰 R$ {agendamento[7]:.2f}")
-                    with col5:
                         status_cor = {
                             "pendente": "🟡 Pendente",
                             "confirmado": "🟢 Confirmado",
@@ -888,140 +972,79 @@ elif menu == "📅 Agendamentos":
                             "cancelado": "🔴 Cancelado"
                         }.get(agendamento[13], "🟡 Pendente")
                         st.write(status_cor)
+                        
+                        if agendamento[13] == "pendente":
+                            col1, col2 = st.columns(2)
+                            with col1:
+                                if st.button("✅ Confirmar", key=f"conf_{agendamento[0]}"):
+                                    db.atualizar_status_agendamento(agendamento[0], "confirmado")
+                                    st.rerun()
+                            with col2:
+                                if st.button("❌ Cancelar", key=f"cancel_{agendamento[0]}"):
+                                    db.atualizar_status_agendamento(agendamento[0], "cancelado")
+                                    st.rerun()
                     st.markdown("---")
         else:
             st.info("Nenhum agendamento encontrado.")
-    
-    with tab3:
-        st.header("✅ Gerenciar Status dos Agendamentos")
-        agendamentos_pendentes = db.listar_agendamentos("pendente")
-        
-        if agendamentos_pendentes:
-            for agendamento in agendamentos_pendentes:
-                with st.container():
-                    col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 1, 1])
-                    with col1:
-                        st.write(f"**{agendamento[2]}**")
-                    with col2:
-                        st.write(f"📅 {datetime.fromisoformat(agendamento[5]).strftime('%d/%m/%Y %H:%M')}")
-                    with col3:
-                        st.write(f"✂️ {agendamento[6]}")
-                    with col4:
-                        st.write(f"💰 R$ {agendamento[7]:.2f}")
-                    with col5:
-                        novo_status = st.selectbox(
-                            "Status",
-                            ["confirmado", "concluido", "cancelado"],
-                            key=f"status_{agendamento[0]}",
-                            label_visibility="collapsed"
-                        )
-                        if st.button("Atualizar", key=f"btn_{agendamento[0]}"):
-                            db.atualizar_status_agendamento(agendamento[0], novo_status)
-                            st.success(f"Status atualizado para {novo_status}!")
-                            st.rerun()
-                    st.markdown("---")
-        else:
-            st.info("Nenhum agendamento pendente.")
 
 # ==================== CLIENTES ====================
 elif menu == "👥 Clientes":
-    st.title("👥 Gestão de Clientes")
+    st.title("👥 Clientes")
     
-    tab1, tab2 = st.tabs(["📋 Lista de Clientes", "➕ Novo Cliente"])
+    clientes = db.listar_clientes()
     
-    with tab1:
-        clientes = db.listar_clientes()
-        
-        if clientes:
-            df_clientes = pd.DataFrame(clientes, columns=['id', 'nome', 'email', 'telefone', 'data_nascimento', 
-                                                           'total_gasto', 'ultima_visita', 'data_cadastro', 'pontos', 'observacoes'])
-            st.dataframe(df_clientes[['nome', 'email', 'telefone', 'total_gasto', 'ultima_visita']], use_container_width=True)
-            
-            st.subheader("🏆 Top 5 Clientes")
-            top_clientes = df_clientes.nlargest(5, 'total_gasto')[['nome', 'total_gasto', 'ultima_visita']]
-            st.dataframe(top_clientes, use_container_width=True)
-        else:
-            st.info("Nenhum cliente cadastrado.")
-    
-    with tab2:
-        with st.form("novo_cliente"):
-            nome = st.text_input("Nome Completo*")
-            email = st.text_input("E-mail")
-            telefone = st.text_input("Telefone")
-            data_nascimento = st.date_input("Data de Nascimento")
-            
-            if st.form_submit_button("Cadastrar Cliente"):
-                if nome:
-                    # Inserir cliente via SQL
-                    cursor = db.conn.cursor()
-                    cursor.execute('''
-                        INSERT INTO clientes (nome, email, telefone, data_nascimento)
-                        VALUES (?, ?, ?, ?)
-                    ''', (nome, email, telefone, data_nascimento))
-                    db.conn.commit()
-                    st.success(f"Cliente {nome} cadastrado com sucesso!")
-                    st.rerun()
-                else:
-                    st.error("Nome é obrigatório!")
+    if clientes:
+        for cliente in clientes:
+            with st.container():
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    st.write(f"**👤 {cliente[1]}**")
+                    st.write(f"📧 {cliente[2] if cliente[2] else 'Não informado'}")
+                    st.write(f"📞 {cliente[3] if cliente[3] else 'Não informado'}")
+                with col2:
+                    st.write(f"💰 Total: R$ {cliente[5]:.2f}")
+                    if cliente[6]:
+                        st.write(f"📅 Última visita: {datetime.fromisoformat(cliente[6]).strftime('%d/%m/%Y')}")
+                st.markdown("---")
+    else:
+        st.info("Nenhum cliente cadastrado.")
 
 # ==================== FINANCEIRO ====================
 elif menu == "💰 Financeiro":
-    st.title("💰 Gestão Financeira")
+    st.title("💰 Financeiro")
     
-    tab1, tab2 = st.tabs(["📊 Visão Geral", "📝 Lançar Despesa"])
+    tab1, tab2 = st.tabs(["📊 Visão Geral", "📝 Despesas"])
     
     with tab1:
         stats = db.get_estatisticas()
         
-        col1, col2, col3 = st.columns(3)
-        
+        col1, col2 = st.columns(2)
         with col1:
             st.metric("Receita Total", f"R$ {stats['receita_total']:.2f}")
-        
         with col2:
             despesas = db.listar_despesas()
             despesa_total = sum(d[2] for d in despesas) if despesas else 0
             st.metric("Despesas Totais", f"R$ {despesa_total:.2f}")
         
-        with col3:
-            lucro = stats['receita_total'] - despesa_total
-            st.metric("Lucro Líquido", f"R$ {lucro:.2f}", 
-                     delta=f"{lucro/stats['receita_total']*100:.1f}%" if stats['receita_total'] > 0 else "0%")
-        
-        st.markdown("---")
-        
-        # Gráfico de receitas
-        if stats['total_agendamentos'] > 0:
-            st.subheader("📈 Evolução da Receita")
-            agendamentos = db.listar_agendamentos()
-            df_receitas = pd.DataFrame(agendamentos, columns=['id', 'cliente_id', 'nome', 'email', 'telefone', 
-                                                                'data_horario', 'servicos', 'valor_total',
-                                                                'corte_simples', 'barba', 'sobrancelha', 
-                                                                'pigmentacao', 'luzes', 'descolorimento', 
-                                                                'status', 'observacoes', 'data_criacao', 'confirmado'])
-            df_receitas['data'] = pd.to_datetime(df_receitas['data_horario']).dt.date
-            receitas_diarias = df_receitas.groupby('data')['valor_total'].sum().reset_index()
-            st.line_chart(receitas_diarias.set_index('data'))
+        lucro = stats['receita_total'] - despesa_total
+        st.metric("Lucro Líquido", f"R$ {lucro:.2f}")
     
     with tab2:
         with st.form("nova_despesa"):
-            descricao = st.text_input("Descrição*")
-            valor = st.number_input("Valor*", min_value=0.01, step=0.01)
+            descricao = st.text_input("Descrição")
+            valor = st.number_input("Valor", min_value=0.01, step=0.01)
             categoria = st.selectbox("Categoria", ["Aluguel", "Salários", "Produtos", "Marketing", "Manutenção", "Outros"])
             data = st.date_input("Data")
-            observacoes = st.text_area("Observações")
             
             if st.form_submit_button("Lançar Despesa"):
                 if descricao and valor > 0:
                     db.inserir_despesa(descricao, valor, categoria, data)
-                    st.success("Despesa lançada com sucesso!")
+                    st.success("Despesa lançada!")
                     st.rerun()
-                else:
-                    st.error("Preencha descrição e valor!")
 
 # ==================== RELATÓRIOS ====================
 elif menu == "📊 Relatórios":
-    st.title("📊 Relatórios Avançados")
+    st.title("📊 Relatórios")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -1033,71 +1056,66 @@ elif menu == "📊 Relatórios":
         agendamentos = db.listar_agendamentos(data_inicio=data_inicio, data_fim=data_fim)
         
         if agendamentos:
-            df = pd.DataFrame(agendamentos, columns=['id', 'cliente_id', 'nome', 'email', 'telefone', 
-                                                      'data_horario', 'servicos', 'valor_total',
-                                                      'corte_simples', 'barba', 'sobrancelha', 
-                                                      'pigmentacao', 'luzes', 'descolorimento', 
-                                                      'status', 'observacoes', 'data_criacao', 'confirmado'])
+            total = len(agendamentos)
+            receita = sum(a[7] for a in agendamentos)
+            ticket = receita / total if total > 0 else 0
             
-            st.markdown("### 📈 Resumo do Período")
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Total Agendamentos", len(df))
+                st.metric("Total", total)
             with col2:
-                st.metric("Receita Total", f"R$ {df['valor_total'].sum():.2f}")
+                st.metric("Receita", f"R$ {receita:.2f}")
             with col3:
-                st.metric("Ticket Médio", f"R$ {df['valor_total'].mean():.2f}")
-            
-            st.markdown("### 🏆 Serviços Mais Vendidos")
-            servicos_vendidos = {
-                "Corte Simples": df['corte_simples'].sum(),
-                "Barba": df['barba'].sum(),
-                "Sobrancelha": df['sobrancelha'].sum(),
-                "Pigmentação": df['pigmentacao'].sum(),
-                "Luzes": df['luzes'].sum(),
-                "Descolorimento": df['descolorimento'].sum()
-            }
-            servicos_df = pd.DataFrame.from_dict(servicos_vendidos, orient='index', columns=['Quantidade'])
-            st.bar_chart(servicos_df)
+                st.metric("Ticket Médio", f"R$ {ticket:.2f}")
             
             # Exportar
+            df = pd.DataFrame(agendamentos, columns=['id', 'cliente_id', 'nome', 'email', 'telefone', 
+                                                       'data_horario', 'servicos', 'valor_total',
+                                                       'corte_simples', 'barba', 'sobrancelha', 
+                                                       'pigmentacao', 'luzes', 'descolorimento', 
+                                                       'status', 'observacoes', 'data_criacao', 'confirmado'])
             csv = df.to_csv(index=False)
-            st.download_button(
-                label="📥 Exportar Relatório (CSV)",
-                data=csv,
-                file_name=f"relatorio_{data_inicio}_{data_fim}.csv",
-                mime="text/csv"
-            )
+            st.download_button("📥 Exportar CSV", csv, f"relatorio_{data_inicio}_{data_fim}.csv", "text/csv")
         else:
-            st.info("Nenhum dado no período selecionado")
+            st.info("Nenhum dado no período")
 
 # ==================== CONFIGURAÇÕES ====================
 elif menu == "⚙️ Configurações":
-    st.title("⚙️ Configurações do Sistema")
+    st.title("⚙️ Configurações")
     
-    tab1, tab2 = st.tabs(["💳 Serviços", "👤 Usuários"])
+    tab1, tab2 = st.tabs(["💳 Serviços", "ℹ️ Sobre"])
     
     with tab1:
-        st.subheader("Preços dos Serviços")
         servicos = db.listar_servicos()
-        
         for servico in servicos:
-            novo_preco = st.number_input(f"{servico[1]}", value=servico[2], step=5, key=f"servico_{servico[0]}")
+            novo_preco = st.number_input(f"{servico[1]}", value=servico[2], step=5, key=f"serv_{servico[0]}")
             if novo_preco != servico[2]:
                 cursor = db.conn.cursor()
                 cursor.execute('UPDATE servicos SET preco = ? WHERE id = ?', (novo_preco, servico[0]))
                 db.conn.commit()
-                st.info(f"Preço de {servico[1]} alterado para R$ {novo_preco:.2f}")
+                st.success(f"Preço atualizado!")
     
     with tab2:
-        st.subheader("Gerenciar Usuários")
-        st.info("Funcionalidade em desenvolvimento - Próxima atualização")
+        st.info("""
+            **Barber Club PRO v1.0**
+            
+            Sistema de Gestão Profissional para Barbearias
+            
+            Funcionalidades:
+            - Agendamento Online
+            - Gestão de Clientes
+            - Controle Financeiro
+            - Relatórios Completos
+            - Banco de Dados SQLite
+            
+            Desenvolvido para barbearias profissionais
+        """)
 
 # Rodapé
 st.markdown("---")
 st.markdown(f"""
     <div style="text-align: center; padding: 20px;">
-        <p style="color: {CORES['secondary']};">💈 Barber Club PRO - Sistema de Gestão Profissional</p>
-        <p style="color: white;">© 2024 - Todos os direitos reservados</p>
+        <p style="color: {CORES['secondary']};">💈 Barber Club PRO</p>
+        <p style="color: white; font-size: 0.8rem;">© 2024 - Sistema de Gestão Profissional</p>
     </div>
 """, unsafe_allow_html=True)
