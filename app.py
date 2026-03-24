@@ -2,7 +2,7 @@ import streamlit as st
 import sqlite3
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import os
 
@@ -14,111 +14,30 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS para esconder sidebar e centralizar conteúdo
+# CSS para esconder sidebar e elementos padrão
 st.markdown("""
     <style>
-        /* Esconder sidebar completamente */
-        [data-testid="stSidebar"] {
-            display: none;
-        }
-        
-        /* Remover espaçamento da sidebar */
-        .main > div {
-            padding-left: 0rem;
-            padding-right: 0rem;
-        }
-        
-        /* Centralizar conteúdo */
-        .block-container {
-            padding-top: 0rem;
-            padding-bottom: 0rem;
-            max-width: 100%;
-        }
-        
-        /* Esconder elementos padrão do Streamlit */
+        [data-testid="stSidebar"] { display: none; }
+        .main > div { padding-left: 0rem; padding-right: 0rem; }
+        .block-container { padding-top: 0rem; padding-bottom: 0rem; max-width: 100%; }
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
-        
-        /* Estilos gerais */
-        .stApp {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-        }
-        
-        /* Títulos */
-        h1, h2, h3 {
-            background: linear-gradient(135deg, #C0C0C0 0%, #8B0000 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: bold;
-        }
-        
-        /* Cards */
-        .premium-card {
-            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.9) 100%);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid #C0C0C0;
-            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5);
-        }
-        
-        /* Botões */
-        .stButton > button {
-            background: linear-gradient(135deg, #8B0000 0%, #C0C0C0 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 25px;
-            font-weight: bold;
-            width: 100%;
-        }
-        
-        /* Métricas */
-        .metric-premium {
-            background: linear-gradient(135deg, #8B0000 0%, #C0C0C0 100%);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            color: white;
-        }
-        
-        /* Inputs */
-        .stTextInput > div > div > input,
-        .stNumberInput > div > div > input,
-        .stSelectbox > div > div {
-            background-color: #2a2a2a;
-            color: white;
-            border: 1px solid #C0C0C0;
-            border-radius: 10px;
-        }
-        
-        /* Tabelas */
-        .dataframe {
-            background: rgba(0,0,0,0.8);
-            border-radius: 10px;
-            color: white;
-        }
-        
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .block-container {
-                padding: 1rem;
-            }
-            h1 { font-size: 1.8rem; }
-            h2 { font-size: 1.4rem; }
-        }
+        .stApp { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
     </style>
 """, unsafe_allow_html=True)
 
 # ==================== BANCO DE DADOS ====================
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect('barber_club.db', check_same_thread=False)
+        self.conn = sqlite3.connect('barbearia_du_cortz.db', check_same_thread=False)
         self.criar_tabelas()
+        self.inserir_dados_teste()
     
     def criar_tabelas(self):
         cursor = self.conn.cursor()
         
+        # Tabela de agendamentos
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS agendamentos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,6 +58,7 @@ class Database:
             )
         ''')
         
+        # Tabela de clientes
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS clientes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -151,6 +71,7 @@ class Database:
             )
         ''')
         
+        # Tabela de despesas
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS despesas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -160,6 +81,64 @@ class Database:
                 data DATE NOT NULL
             )
         ''')
+        
+        self.conn.commit()
+    
+    def inserir_dados_teste(self):
+        cursor = self.conn.cursor()
+        
+        # Verificar se já existem dados
+        cursor.execute('SELECT COUNT(*) FROM agendamentos')
+        if cursor.fetchone()[0] > 0:
+            return
+        
+        # Clientes de teste
+        clientes_teste = [
+            ("Carlos Silva", "carlos@email.com", "(11) 99999-1111", 150.00, datetime.now() - timedelta(days=2)),
+            ("Roberto Santos", "roberto@email.com", "(11) 99999-2222", 85.00, datetime.now() - timedelta(days=5)),
+            ("Fernanda Lima", "fernanda@email.com", "(11) 99999-3333", 120.00, datetime.now() - timedelta(days=1)),
+            ("Julio Cesar", "julio@email.com", "(11) 99999-4444", 200.00, datetime.now() - timedelta(days=3)),
+            ("Mariana Costa", "mariana@email.com", "(11) 99999-5555", 95.00, datetime.now() - timedelta(days=4)),
+        ]
+        
+        for cliente in clientes_teste:
+            cursor.execute('''
+                INSERT OR IGNORE INTO clientes (nome, email, telefone, total_gasto, ultima_visita)
+                VALUES (?, ?, ?, ?, ?)
+            ''', cliente)
+        
+        # Agendamentos de teste
+        agendamentos_teste = [
+            ("Carlos Silva", "carlos@email.com", "(11) 99999-1111", datetime.now() + timedelta(hours=2), "Corte Simples", 35, 1,0,0,0,0,0, "confirmado"),
+            ("Fernanda Lima", "fernanda@email.com", "(11) 99999-3333", datetime.now() + timedelta(days=1, hours=10), "Corte Simples, Luzes", 70, 1,0,0,0,1,0, "pendente"),
+            ("Roberto Santos", "roberto@email.com", "(11) 99999-2222", datetime.now() + timedelta(days=2, hours=14), "Barba, Sobrancelha", 20, 0,1,1,0,0,0, "confirmado"),
+            ("Julio Cesar", "julio@email.com", "(11) 99999-4444", datetime.now() + timedelta(days=3, hours=16), "Corte Simples, Barba", 45, 1,1,0,0,0,0, "pendente"),
+            ("Mariana Costa", "mariana@email.com", "(11) 99999-5555", datetime.now() + timedelta(days=4, hours=11), "Pigmentação", 50, 0,0,0,1,0,0, "confirmado"),
+            ("Carlos Silva", "carlos@email.com", "(11) 99999-1111", datetime.now() - timedelta(days=1, hours=3), "Corte Simples", 35, 1,0,0,0,0,0, "concluido"),
+            ("Fernanda Lima", "fernanda@email.com", "(11) 99999-3333", datetime.now() - timedelta(days=3, hours=5), "Corte Simples, Barba", 45, 1,1,0,0,0,0, "concluido"),
+        ]
+        
+        for ag in agendamentos_teste:
+            cursor.execute('''
+                INSERT INTO agendamentos (nome, email, telefone, data_horario, servicos, valor_total,
+                corte_simples, barba, sobrancelha, pigmentacao, luzes, descolorimento, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', ag)
+        
+        # Despesas de teste
+        despesas_teste = [
+            ("Aluguel da Loja", 2500.00, "Aluguel", datetime.now().replace(day=1).strftime('%Y-%m-%d')),
+            ("Compra de Produtos", 850.00, "Produtos", datetime.now().strftime('%Y-%m-%d')),
+            ("Salário Barbeiro", 2000.00, "Salários", datetime.now().replace(day=5).strftime('%Y-%m-%d')),
+            ("Marketing Digital", 300.00, "Marketing", datetime.now().strftime('%Y-%m-%d')),
+            ("Manutenção Cadeiras", 450.00, "Manutenção", (datetime.now() - timedelta(days=15)).strftime('%Y-%m-%d')),
+        ]
+        
+        for despesa in despesas_teste:
+            cursor.execute('''
+                INSERT INTO despesas (descricao, valor, categoria, data)
+                VALUES (?, ?, ?, ?)
+            ''', despesa)
         
         self.conn.commit()
     
@@ -186,13 +165,14 @@ class Database:
         cursor.execute('''
             INSERT INTO agendamentos (
                 nome, email, telefone, data_horario, servicos, valor_total,
-                corte_simples, barba, sobrancelha, pigmentacao, luzes, descolorimento
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                corte_simples, barba, sobrancelha, pigmentacao, luzes, descolorimento, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             dados['nome'], dados.get('email', ''), dados.get('telefone', ''),
             dados['data_horario'], dados['servicos'], dados['valor_total'],
             dados.get('corte_simples', 0), dados.get('barba', 0), dados.get('sobrancelha', 0),
-            dados.get('pigmentacao', 0), dados.get('luzes', 0), dados.get('descolorimento', 0)
+            dados.get('pigmentacao', 0), dados.get('luzes', 0), dados.get('descolorimento', 0),
+            'pendente'
         ))
         
         self.conn.commit()
@@ -200,7 +180,7 @@ class Database:
     
     def listar_agendamentos(self, status=None):
         cursor = self.conn.cursor()
-        if status:
+        if status and status != 'todos':
             cursor.execute('SELECT * FROM agendamentos WHERE status = ? ORDER BY data_horario DESC', (status,))
         else:
             cursor.execute('SELECT * FROM agendamentos ORDER BY data_horario DESC')
@@ -237,37 +217,48 @@ class Database:
         total_agendamentos = cursor.fetchone()[0]
         cursor.execute('SELECT SUM(valor_total) FROM agendamentos')
         receita_total = cursor.fetchone()[0] or 0
+        cursor.execute('SELECT COUNT(*) FROM agendamentos WHERE status = "pendente"')
+        pendentes = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) FROM agendamentos WHERE status = "confirmado"')
+        confirmados = cursor.fetchone()[0]
+        cursor.execute('SELECT COUNT(*) FROM agendamentos WHERE status = "concluido"')
+        concluidos = cursor.fetchone()[0]
+        
         return {
             'total_clientes': total_clientes,
             'total_agendamentos': total_agendamentos,
-            'receita_total': receita_total
+            'receita_total': receita_total,
+            'pendentes': pendentes,
+            'confirmados': confirmados,
+            'concluidos': concluidos
         }
 
+# Inicializar banco de dados
 db = Database()
 
 # ==================== HTML COMPLETO ====================
-def get_html_content(active_page="dashboard"):
-    html = f'''<!DOCTYPE html>
+HTML_TEMPLATE = '''
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Barbearia Du Cortz</title>
     <style>
-        * {{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }}
+        }
         
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             min-height: 100vh;
-        }}
+        }
         
         /* Top Navigation */
-        .top-nav {{
+        .top-nav {
             background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             padding: 12px 20px;
             position: sticky;
@@ -275,9 +266,9 @@ def get_html_content(active_page="dashboard"):
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             border-bottom: 2px solid #C0C0C0;
-        }}
+        }
         
-        .nav-container {{
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
@@ -285,9 +276,9 @@ def get_html_content(active_page="dashboard"):
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-        }}
+        }
         
-        .logo {{
+        .logo {
             color: white;
             font-size: 1.5rem;
             font-weight: bold;
@@ -295,29 +286,16 @@ def get_html_content(active_page="dashboard"):
             display: flex;
             align-items: center;
             gap: 8px;
-        }}
+            cursor: pointer;
+        }
         
-        .logo-icon {{
-            font-size: 2rem;
-        }}
+        .logo-icon { font-size: 2rem; }
+        .logo-text { background: linear-gradient(135deg, #C0C0C0 0%, #fff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { color: #C0C0C0; }
         
-        .logo-text {{
-            background: linear-gradient(135deg, #C0C0C0 0%, #fff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }}
+        .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
         
-        .logo span {{
-            color: #C0C0C0;
-        }}
-        
-        .nav-links {{
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }}
-        
-        .nav-btn {{
+        .nav-btn {
             background: rgba(0,0,0,0.5);
             color: white;
             border: 1px solid #C0C0C0;
@@ -326,72 +304,54 @@ def get_html_content(active_page="dashboard"):
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }}
+        }
         
-        .nav-btn:hover, .nav-btn.active {{
+        .nav-btn:hover, .nav-btn.active {
             background: #8B0000;
             border-color: #C0C0C0;
             transform: translateY(-2px);
-        }}
+        }
         
-        @media (max-width: 768px) {{
-            .nav-container {{
-                flex-direction: column;
-            }}
-            .nav-links {{
-                justify-content: center;
-            }}
-            .nav-btn {{
-                padding: 6px 12px;
-                font-size: 12px;
-            }}
-        }}
+        @media (max-width: 768px) {
+            .nav-container { flex-direction: column; }
+            .nav-links { justify-content: center; }
+            .nav-btn { padding: 6px 12px; font-size: 12px; }
+        }
         
         /* Main Content */
-        .main-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }}
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
         /* Cards */
-        .card {{
+        .card {
             background: rgba(0,0,0,0.85);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid #C0C0C0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }}
+        }
         
-        .card-title {{
+        .card-title {
             color: #C0C0C0;
             font-size: 1.2rem;
             margin-bottom: 15px;
             font-weight: bold;
             border-left: 4px solid #8B0000;
             padding-left: 12px;
-        }}
+        }
         
         /* Grid */
-        .grid-2, .grid-3, .grid-4 {{
-            display: grid;
-            gap: 20px;
-            margin-bottom: 20px;
-        }}
+        .grid-2, .grid-3, .grid-4 { display: grid; gap: 20px; margin-bottom: 20px; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
         
-        .grid-2 {{ grid-template-columns: repeat(2, 1fr); }}
-        .grid-3 {{ grid-template-columns: repeat(3, 1fr); }}
-        .grid-4 {{ grid-template-columns: repeat(4, 1fr); }}
-        
-        @media (max-width: 768px) {{
-            .grid-2, .grid-3, .grid-4 {{ grid-template-columns: 1fr; }}
-        }}
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
         
         /* Metric Cards */
-        .metric-card {{
+        .metric-card {
             background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             border-radius: 15px;
             padding: 20px;
@@ -399,32 +359,17 @@ def get_html_content(active_page="dashboard"):
             color: white;
             border: 1px solid #C0C0C0;
             transition: transform 0.3s;
-        }}
+            cursor: pointer;
+        }
         
-        .metric-card:hover {{
-            transform: translateY(-5px);
-        }}
-        
-        .metric-value {{
-            font-size: 2rem;
-            font-weight: bold;
-            margin-top: 10px;
-            color: #C0C0C0;
-        }}
+        .metric-card:hover { transform: translateY(-5px); }
+        .metric-value { font-size: 2rem; font-weight: bold; margin-top: 10px; color: #C0C0C0; }
         
         /* Form */
-        .form-group {{
-            margin-bottom: 20px;
-        }}
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #C0C0C0; font-weight: bold; }
         
-        label {{
-            display: block;
-            margin-bottom: 8px;
-            color: #C0C0C0;
-            font-weight: bold;
-        }}
-        
-        input, select {{
+        input, select {
             width: 100%;
             padding: 12px;
             background: #2a2a2a;
@@ -433,15 +378,15 @@ def get_html_content(active_page="dashboard"):
             color: white;
             font-size: 16px;
             transition: all 0.3s;
-        }}
+        }
         
-        input:focus, select:focus {{
+        input:focus, select:focus {
             outline: none;
             border-color: #8B0000;
             background: #1a1a1a;
-        }}
+        }
         
-        button {{
+        button {
             background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
             color: white;
             border: none;
@@ -452,26 +397,20 @@ def get_html_content(active_page="dashboard"):
             cursor: pointer;
             width: 100%;
             transition: all 0.3s;
-        }}
+        }
         
-        button:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(139,0,0,0.3);
-        }}
-        
-        button:active {{
-            transform: scale(0.98);
-        }}
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(139,0,0,0.3); }
+        button:active { transform: scale(0.98); }
         
         /* Services Grid */
-        .services-grid {{
+        .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 15px;
-        }}
+        }
         
-        .service-item {{
+        .service-item {
             background: #2a2a2a;
             border: 2px solid #C0C0C0;
             border-radius: 12px;
@@ -480,154 +419,94 @@ def get_html_content(active_page="dashboard"):
             text-align: center;
             color: white;
             transition: all 0.3s;
-        }}
+        }
         
-        .service-item:hover {{
-            transform: translateY(-3px);
-            border-color: #8B0000;
-        }}
-        
-        .service-item.selected {{
-            background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%);
-            border-color: #C0C0C0;
-        }}
-        
-        .service-name {{
-            font-weight: bold;
-            margin-bottom: 5px;
-        }}
-        
-        .service-price {{
-            color: #C0C0C0;
-            font-weight: bold;
-            margin-top: 5px;
-        }}
-        
-        .service-item.selected .service-price {{
-            color: white;
-        }}
+        .service-item:hover { transform: translateY(-3px); border-color: #8B0000; }
+        .service-item.selected { background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%); border-color: #C0C0C0; }
+        .service-name { font-weight: bold; margin-bottom: 5px; }
+        .service-price { color: #C0C0C0; font-weight: bold; margin-top: 5px; }
+        .service-item.selected .service-price { color: white; }
         
         /* Tables */
-        .data-table {{
+        .data-table {
             width: 100%;
             background: rgba(0,0,0,0.7);
             border-radius: 10px;
             overflow-x: auto;
-        }}
+        }
         
-        .data-table table {{
-            width: 100%;
-            border-collapse: collapse;
-        }}
-        
-        .data-table th, .data-table td {{
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #C0C0C0;
-            color: white;
-        }}
-        
-        .data-table th {{
-            color: #C0C0C0;
-            font-weight: bold;
-            background: rgba(139,0,0,0.3);
-        }}
-        
-        .data-table tr:hover {{
-            background: rgba(139,0,0,0.2);
-        }}
-        
-        /* Messages */
-        .message {{
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-        }}
-        
-        .message.success {{
-            background: #28A745;
-            color: white;
-            display: block;
-        }}
-        
-        .message.error {{
-            background: #DC3545;
-            color: white;
-            display: block;
-        }}
+        .data-table table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #C0C0C0; color: white; }
+        .data-table th { color: #C0C0C0; font-weight: bold; background: rgba(139,0,0,0.3); }
+        .data-table tr:hover { background: rgba(139,0,0,0.2); }
         
         /* Status badges */
-        .status {{
+        .status {
             padding: 4px 8px;
             border-radius: 5px;
             font-size: 12px;
             display: inline-block;
             font-weight: bold;
-        }}
-        
-        .status-pendente {{ background: #FFC107; color: #000; }}
-        .status-confirmado {{ background: #28A745; color: #fff; }}
-        .status-concluido {{ background: #17A2B8; color: #fff; }}
-        .status-cancelado {{ background: #DC3545; color: #fff; }}
+        }
+        .status-pendente { background: #FFC107; color: #000; }
+        .status-confirmado { background: #28A745; color: #fff; }
+        .status-concluido { background: #17A2B8; color: #fff; }
+        .status-cancelado { background: #DC3545; color: #fff; }
         
         /* Action buttons */
-        .action-btn {{
+        .action-btn {
             padding: 4px 8px;
             margin: 0 2px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 12px;
-        }}
+            width: auto;
+        }
+        .btn-confirm { background: #28A745; color: white; }
+        .btn-cancel { background: #DC3545; color: white; }
         
-        .btn-confirm {{
-            background: #28A745;
-            color: white;
-        }}
-        
-        .btn-cancel {{
-            background: #DC3545;
-            color: white;
-        }}
+        /* Messages */
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        .message.success { background: #28A745; color: white; display: block; }
+        .message.error { background: #DC3545; color: white; display: block; }
         
         /* Footer */
-        .footer {{
+        .footer {
             text-align: center;
             padding: 20px;
             color: #C0C0C0;
             font-size: 12px;
             border-top: 1px solid #C0C0C0;
             margin-top: 20px;
-        }}
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #C0C0C0;
+        }
         
         /* Scrollbar */
-        ::-webkit-scrollbar {{
-            width: 8px;
-            height: 8px;
-        }}
-        
-        ::-webkit-scrollbar-track {{
-            background: #1a1a1a;
-        }}
-        
-        ::-webkit-scrollbar-thumb {{
-            background: #8B0000;
-            border-radius: 4px;
-        }}
-        
-        ::-webkit-scrollbar-thumb:hover {{
-            background: #C0C0C0;
-        }}
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #8B0000; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C0C0C0; }
     </style>
 </head>
 <body>
     <div class="top-nav">
         <div class="nav-container">
-            <a href="#" onclick="showPage('dashboard')" class="logo">
+            <div class="logo" onclick="showPage('dashboard')">
                 <span class="logo-icon">💈</span>
                 <span class="logo-text">Barbearia <span>Du Cortz</span></span>
-            </a>
+            </div>
             <div class="nav-links">
                 <button class="nav-btn" onclick="showPage('dashboard')">🏠 Dashboard</button>
                 <button class="nav-btn" onclick="showPage('agendamento')">📅 Agendar</button>
@@ -641,12 +520,12 @@ def get_html_content(active_page="dashboard"):
     <div class="main-content">
         <!-- Dashboard Page -->
         <div id="dashboard-page" class="page">
-            <div class="grid-4" id="dashboard-metrics">
-                <div class="metric-card">
+            <div class="grid-4">
+                <div class="metric-card" onclick="showPage('clientes')">
                     <div>👥 Clientes</div>
                     <div class="metric-value" id="total-clientes">0</div>
                 </div>
-                <div class="metric-card">
+                <div class="metric-card" onclick="showPage('lista')">
                     <div>📅 Agendamentos</div>
                     <div class="metric-value" id="total-agendamentos">0</div>
                 </div>
@@ -659,14 +538,28 @@ def get_html_content(active_page="dashboard"):
                     <div class="metric-value" id="ticket-medio">R$ 0</div>
                 </div>
             </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-title">🟡 Pendentes</div>
+                    <div style="font-size: 2rem; text-align: center; color: #FFC107;" id="pendentes">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🟢 Confirmados</div>
+                    <div style="font-size: 2rem; text-align: center; color: #28A745;" id="confirmados">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">🔵 Concluídos</div>
+                    <div style="font-size: 2rem; text-align: center; color: #17A2B8;" id="concluidos">0</div>
+                </div>
+            </div>
+            
             <div class="card">
-                <div class="card-title">📅 Últimos Agendamentos</div>
-                <div class="data-table" id="ultimos-agendamentos">
+                <div class="card-title">📅 Próximos Agendamentos</div>
+                <div class="data-table" id="proximos-agendamentos">
                     <table>
-                        <thead>
-                            <tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th></tr>
-                        </thead>
-                        <tbody id="ultimos-tbody"></tbody>
+                        <thead><tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th></tr></thead>
+                        <tbody id="proximos-tbody"></tbody>
                     </table>
                 </div>
             </div>
@@ -675,7 +568,7 @@ def get_html_content(active_page="dashboard"):
         <!-- Agendamento Page -->
         <div id="agendamento-page" class="page" style="display:none;">
             <div class="card">
-                <div class="card-title">✂️ Novo Agendamento - Barbearia Du Cortz</div>
+                <div class="card-title">✂️ Novo Agendamento</div>
                 <form id="agendamento-form">
                     <div class="form-group">
                         <label>👤 Nome Completo *</label>
@@ -785,152 +678,163 @@ def get_html_content(active_page="dashboard"):
         let servicosSelecionados = new Map();
         
         const servicos = [
-            {{ id: 'corte_simples', nome: '✂️ Corte Simples', preco: 35 }},
-            {{ id: 'barba', nome: '🧔 Barba', preco: 10 }},
-            {{ id: 'sobrancelha', nome: '👁️ Sobrancelha', preco: 10 }},
-            {{ id: 'pigmentacao', nome: '🎨 Pigmentação', preco: 50 }},
-            {{ id: 'luzes', nome: '✨ Luzes', preco: 35 }},
-            {{ id: 'descolorimento', nome: '⚡ Descolorimento', preco: 50 }}
+            { id: 'corte_simples', nome: '✂️ Corte Simples', preco: 35 },
+            { id: 'barba', nome: '🧔 Barba', preco: 10 },
+            { id: 'sobrancelha', nome: '👁️ Sobrancelha', preco: 10 },
+            { id: 'pigmentacao', nome: '🎨 Pigmentação', preco: 50 },
+            { id: 'luzes', nome: '✨ Luzes', preco: 35 },
+            { id: 'descolorimento', nome: '⚡ Descolorimento', preco: 50 }
         ];
         
-        function renderServices() {{
+        function renderServices() {
             const grid = document.getElementById('services-grid');
             if (!grid) return;
             grid.innerHTML = '';
-            servicos.forEach(s => {{
+            servicos.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'service-item';
                 div.setAttribute('data-servico', s.id);
                 div.setAttribute('data-preco', s.preco);
-                div.innerHTML = `<div class="service-name">${{s.nome}}</div><div class="service-price">R$ ${{s.preco.toFixed(2)}}</div>`;
+                div.innerHTML = `<div class="service-name">${s.nome}</div><div class="service-price">R$ ${s.preco.toFixed(2)}</div>`;
                 div.onclick = () => toggleServico(div, s.id, s.preco);
                 grid.appendChild(div);
-            }});
-        }}
+            });
+        }
         
-        function toggleServico(element, servico, preco) {{
-            if (servicosSelecionados.has(servico)) {{
+        function toggleServico(element, servico, preco) {
+            if (servicosSelecionados.has(servico)) {
                 servicosSelecionados.delete(servico);
                 element.classList.remove('selected');
-            }} else {{
+            } else {
                 servicosSelecionados.set(servico, preco);
                 element.classList.add('selected');
-            }}
+            }
             updateTotal();
-        }}
+        }
         
-        function updateTotal() {{
+        function updateTotal() {
             let total = 0;
             servicosSelecionados.forEach((preco) => total += preco);
             const totalEl = document.getElementById('total-valor');
-            if (totalEl) totalEl.textContent = `R$ ${{total.toFixed(2)}}`;
-        }}
+            if (totalEl) totalEl.textContent = `R$ ${total.toFixed(2)}`;
+        }
         
-        function getServicosTexto() {{
-            const servicosMap = {{
+        function getServicosTexto() {
+            const servicosMap = {
                 'corte_simples': 'Corte Simples',
                 'barba': 'Barba',
                 'sobrancelha': 'Sobrancelha',
                 'pigmentacao': 'Pigmentação',
                 'luzes': 'Luzes',
                 'descolorimento': 'Descolorimento'
-            }};
+            };
             let servicosLista = [];
             servicosSelecionados.forEach((_, servico) => servicosLista.push(servicosMap[servico]));
             return servicosLista.join(', ');
-        }}
+        }
         
-        function showPage(page) {{
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const url = `/api/${endpoint}`;
+            const options = { method };
+            if (data) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(data);
+            }
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+        
+        function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-            document.getElementById(`${{page}}-page`).style.display = 'block';
+            document.getElementById(`${page}-page`).style.display = 'block';
             
             if (page === 'dashboard') loadDashboard();
             if (page === 'lista') loadAgendamentos();
             if (page === 'clientes') loadClientes();
             if (page === 'financeiro') loadFinanceiro();
-        }}
+        }
         
-        async function loadDashboard() {{
-            const response = await fetch('/api/estatisticas');
-            const data = await response.json();
-            document.getElementById('total-clientes').textContent = data.total_clientes;
-            document.getElementById('total-agendamentos').textContent = data.total_agendamentos;
-            document.getElementById('receita-total').textContent = `R$ ${{data.receita_total.toFixed(2)}}`;
-            const ticketMedio = data.total_agendamentos > 0 ? data.receita_total / data.total_agendamentos : 0;
-            document.getElementById('ticket-medio').textContent = `R$ ${{ticketMedio.toFixed(2)}}`;
+        async function loadDashboard() {
+            const stats = await apiCall('estatisticas');
+            document.getElementById('total-clientes').textContent = stats.total_clientes;
+            document.getElementById('total-agendamentos').textContent = stats.total_agendamentos;
+            document.getElementById('receita-total').textContent = `R$ ${stats.receita_total.toFixed(2)}`;
+            document.getElementById('pendentes').textContent = stats.pendentes;
+            document.getElementById('confirmados').textContent = stats.confirmados;
+            document.getElementById('concluidos').textContent = stats.concluidos;
             
-            const agendamentos = await fetch('/api/agendamentos').then(r => r.json());
-            const tbody = document.getElementById('ultimos-tbody');
+            const ticketMedio = stats.total_agendamentos > 0 ? stats.receita_total / stats.total_agendamentos : 0;
+            document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toFixed(2)}`;
+            
+            const agendamentos = await apiCall('agendamentos');
+            const tbody = document.getElementById('proximos-tbody');
             tbody.innerHTML = '';
-            agendamentos.slice(0, 10).forEach(a => {{
+            const agora = new Date();
+            const proximos = agendamentos.filter(a => new Date(a[5]) > agora).slice(0, 10);
+            
+            proximos.forEach(a => {
                 const row = tbody.insertRow();
                 row.insertCell(0).textContent = a[2];
                 row.insertCell(1).textContent = new Date(a[5]).toLocaleString('pt-BR');
                 row.insertCell(2).textContent = a[6];
-                row.insertCell(3).textContent = `R$ ${{a[7].toFixed(2)}}`;
-                row.insertCell(4).innerHTML = `<span class="status status-${{a[13]}}">${{a[13]}}</span>`;
-            }});
-        }}
+                row.insertCell(3).textContent = `R$ ${a[7].toFixed(2)}`;
+                row.insertCell(4).innerHTML = `<span class="status status-${a[13]}">${a[13]}</span>`;
+            });
+        }
         
-        async function loadAgendamentos() {{
+        async function loadAgendamentos() {
             const filtro = document.getElementById('status-filtro')?.value || 'todos';
-            const response = await fetch(`/api/agendamentos?status=${{filtro === 'todos' ? '' : filtro}}`);
-            const agendamentos = await response.json();
+            const agendamentos = await apiCall(`agendamentos?status=${filtro === 'todos' ? '' : filtro}`);
             const container = document.getElementById('agendamentos-table');
             if (!container) return;
             
             let html = '<table><thead><tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
-            agendamentos.forEach(a => {{
+            agendamentos.forEach(a => {
                 html += `<tr>
-                    <td>${{a[2]}}</td>
-                    <td>${{new Date(a[5]).toLocaleString('pt-BR')}}</td>
-                    <td>${{a[6]}}</td>
-                    <td>R$ ${{a[7].toFixed(2)}}</td>
-                    <td><span class="status status-${{a[13]}}">${{a[13]}}</span></td>
+                    <td><strong>${a[2]}</strong></td>
+                    <td>${new Date(a[5]).toLocaleString('pt-BR')}</td>
+                    <td>${a[6]}</td>
+                    <td>R$ ${a[7].toFixed(2)}</td>
+                    <td><span class="status status-${a[13]}">${a[13]}</span></td>
                     <td>`;
-                if (a[13] === 'pendente') {{
-                    html += `<button class="action-btn btn-confirm" onclick="updateStatus(${{a[0]}}, 'confirmado')">✅ Confirmar</button>`;
-                    html += `<button class="action-btn btn-cancel" onclick="updateStatus(${{a[0]}}, 'cancelado')">❌ Cancelar</button>`;
-                }}
+                if (a[13] === 'pendente') {
+                    html += `<button class="action-btn btn-confirm" onclick="updateStatus(${a[0]}, 'confirmado')">✅ Confirmar</button>`;
+                    html += `<button class="action-btn btn-cancel" onclick="updateStatus(${a[0]}, 'cancelado')">❌ Cancelar</button>`;
+                }
                 html += `</td></tr>`;
-            }});
+            });
             html += '</tbody></table>';
             container.innerHTML = html;
-        }}
+        }
         
-        async function updateStatus(id, status) {{
-            await fetch('/api/atualizar_status', {{
-                method: 'POST',
-                headers: {{'Content-Type': 'application/json'}},
-                body: JSON.stringify({{id, status}})
-            }});
+        async function updateStatus(id, status) {
+            await apiCall('atualizar_status', 'POST', { id, status });
             loadAgendamentos();
             loadDashboard();
-        }}
+        }
         
-        async function loadClientes() {{
-            const response = await fetch('/api/clientes');
-            const clientes = await response.json();
+        async function loadClientes() {
+            const clientes = await apiCall('clientes');
             const container = document.getElementById('clientes-table');
             if (!container) return;
             
             let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Total Gasto</th><th>Última Visita</th></tr></thead><tbody>';
-            clientes.forEach(c => {{
+            clientes.forEach(c => {
                 html += `<tr>
-                    <td><strong>${{c[1]}}</strong></td>
-                    <td>${{c[2] || '-'}}</td>
-                    <td>${{c[3] || '-'}}</td>
-                    <td><span style="color: #C0C0C0;">R$ ${{(c[5] || 0).toFixed(2)}}</span></td>
-                    <td>${{c[6] ? new Date(c[6]).toLocaleDateString('pt-BR') : '-'}}</td>
+                    <td><strong>${c[1]}</strong></td>
+                    <td>${c[2] || '-'}</td>
+                    <td>${c[3] || '-'}</td>
+                    <td><span style="color: #C0C0C0;">R$ ${(c[5] || 0).toFixed(2)}</span></td>
+                    <td>${c[6] ? new Date(c[6]).toLocaleDateString('pt-BR') : '-'}</td>
                 </tr>`;
-            }});
+            });
             html += '</tbody></table>';
             container.innerHTML = html;
-        }}
+        }
         
-        async function loadFinanceiro() {{
-            const despesas = await fetch('/api/despesas').then(r => r.json());
-            const agendamentos = await fetch('/api/agendamentos').then(r => r.json());
+        async function loadFinanceiro() {
+            const despesas = await apiCall('despesas');
+            const agendamentos = await apiCall('agendamentos');
             
             const receita = agendamentos.reduce((sum, a) => sum + a[7], 0);
             const despesaTotal = despesas.reduce((sum, d) => sum + d[2], 0);
@@ -938,48 +842,48 @@ def get_html_content(active_page="dashboard"):
             
             document.getElementById('resumo-financeiro').innerHTML = `
                 <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
-                    <div><strong>💰 Receita Total:</strong> <span style="color: #C0C0C0;">R$ ${{receita.toFixed(2)}}</span></div>
+                    <div><strong>💰 Receita Total:</strong> <span style="color: #C0C0C0;">R$ ${receita.toFixed(2)}</span></div>
                 </div>
                 <div style="margin-bottom:15px; padding:10px; background: #2a2a2a; border-radius:8px;">
-                    <div><strong>📉 Despesas Totais:</strong> <span style="color: #C0C0C0;">R$ ${{despesaTotal.toFixed(2)}}</span></div>
+                    <div><strong>📉 Despesas Totais:</strong> <span style="color: #C0C0C0;">R$ ${despesaTotal.toFixed(2)}</span></div>
                 </div>
                 <div style="padding:10px; background: linear-gradient(135deg, #8B0000 0%, #4a4a4a 100%); border-radius:8px;">
-                    <div><strong>📈 Lucro Líquido:</strong> <span style="color: #C0C0C0;">R$ ${{lucro.toFixed(2)}}</span></div>
+                    <div><strong>📈 Lucro Líquido:</strong> <span style="color: #C0C0C0;">R$ ${lucro.toFixed(2)}</span></div>
                 </div>
             `;
             
             let html = '<table><thead><tr><th>Descrição</th><th>Valor</th><th>Categoria</th><th>Data</th></tr></thead><tbody>';
-            despesas.forEach(d => {{
-                html += `什
-                    <td>${{d[1]}}</td>
-                    <td><span style="color: #C0C0C0;">R$ ${{d[2].toFixed(2)}}</span></td>
-                    <td>${{d[3]}}</td>
-                    <td>${{new Date(d[4]).toLocaleDateString('pt-BR')}}</td>
+            despesas.forEach(d => {
+                html += `<tr>
+                    <td>${d[1]}</td>
+                    <td><span style="color: #C0C0C0;">R$ ${d[2].toFixed(2)}</span></td>
+                    <td>${d[3]}</td>
+                    <td>${new Date(d[4]).toLocaleDateString('pt-BR')}</td>
                 </tr>`;
-            }});
+            });
             html += '</tbody></table>';
             document.getElementById('despesas-table').innerHTML = html;
-        }}
+        }
         
-        document.getElementById('agendamento-form')?.addEventListener('submit', async (e) => {{
+        document.getElementById('agendamento-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const nome = document.getElementById('nome').value;
             const email = document.getElementById('email').value;
             const telefone = document.getElementById('telefone').value;
             const horario = document.getElementById('horario').value;
             
-            if (!nome || !horario || servicosSelecionados.size === 0) {{
+            if (!nome || !horario || servicosSelecionados.size === 0) {
                 const msg = document.getElementById('agendamento-message');
                 msg.textContent = '❌ Preencha todos os campos obrigatórios e selecione pelo menos um serviço!';
                 msg.className = 'message error';
                 setTimeout(() => msg.style.display = 'none', 3000);
                 return;
-            }}
+            }
             
             let total = 0;
             servicosSelecionados.forEach((preco) => total += preco);
             
-            const dados = {{
+            const dados = {
                 nome, email, telefone,
                 data_horario: new Date(horario).toISOString(),
                 servicos: getServicosTexto(),
@@ -990,56 +894,45 @@ def get_html_content(active_page="dashboard"):
                 pigmentacao: servicosSelecionados.has('pigmentacao') ? 1 : 0,
                 luzes: servicosSelecionados.has('luzes') ? 1 : 0,
                 descolorimento: servicosSelecionados.has('descolorimento') ? 1 : 0
-            }};
+            };
             
-            const response = await fetch('/api/agendar', {{
-                method: 'POST',
-                headers: {{'Content-Type': 'application/json'}},
-                body: JSON.stringify(dados)
-            }});
-            
-            const result = await response.json();
+            const result = await apiCall('agendar', 'POST', dados);
             const msg = document.getElementById('agendamento-message');
-            if (result.success) {{
-                msg.textContent = '✅ Agendamento realizado com sucesso! Redirecionando...';
+            if (result.success) {
+                msg.textContent = '✅ Agendamento realizado com sucesso!';
                 msg.className = 'message success';
                 document.getElementById('agendamento-form').reset();
                 servicosSelecionados.clear();
                 document.querySelectorAll('.service-item').forEach(i => i.classList.remove('selected'));
                 updateTotal();
                 setTimeout(() => showPage('dashboard'), 2000);
-            }} else {{
+            } else {
                 msg.textContent = '❌ Erro ao agendar. Tente novamente.';
                 msg.className = 'message error';
-            }}
+            }
             setTimeout(() => msg.style.display = 'none', 3000);
-        }});
+        });
         
-        document.getElementById('despesa-form')?.addEventListener('submit', async (e) => {{
+        document.getElementById('despesa-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const descricao = document.getElementById('descricao').value;
             const valor = parseFloat(document.getElementById('valor-despesa').value);
             const categoria = document.getElementById('categoria').value;
             const data = document.getElementById('data-despesa').value;
             
-            const response = await fetch('/api/despesa', {{
-                method: 'POST',
-                headers: {{'Content-Type': 'application/json'}},
-                body: JSON.stringify({{descricao, valor, categoria, data}})
-            }});
-            
+            const result = await apiCall('despesa', 'POST', { descricao, valor, categoria, data });
             const msg = document.getElementById('despesa-message');
-            if (response.ok) {{
+            if (result.success) {
                 msg.textContent = '✅ Despesa lançada com sucesso!';
                 msg.className = 'message success';
                 document.getElementById('despesa-form').reset();
                 loadFinanceiro();
-            }} else {{
+            } else {
                 msg.textContent = '❌ Erro ao lançar despesa.';
                 msg.className = 'message error';
-            }}
+            }
             setTimeout(() => msg.style.display = 'none', 3000);
-        }});
+        });
         
         document.getElementById('status-filtro')?.addEventListener('change', () => loadAgendamentos());
         
@@ -1054,16 +947,15 @@ def get_html_content(active_page="dashboard"):
         loadDashboard();
     </script>
 </body>
-</html>'''
-    return html
+</html>
+'''
 
 # ==================== API ROTAS ====================
-def handle_api():
-    from flask import Flask, request, jsonify
-    import sys
+def process_api():
+    query_params = st.query_params
     
-    if '/api/' in st.query_params:
-        path = st.query_params.get('api_path', [''])[0]
+    if 'api_path' in query_params:
+        path = query_params.get('api_path', [''])[0]
         
         if path == 'estatisticas':
             stats = db.get_estatisticas()
@@ -1071,7 +963,7 @@ def handle_api():
             st.stop()
         
         elif path == 'agendamentos':
-            status = st.query_params.get('status', [None])[0]
+            status = query_params.get('status', [None])[0]
             agendamentos = db.listar_agendamentos(status if status else None)
             st.json(agendamentos)
             st.stop()
@@ -1086,30 +978,27 @@ def handle_api():
             st.json(despesas)
             st.stop()
         
-        elif path == 'agendar' and st.query_params.get('data'):
-            dados = json.loads(st.query_params.get('data', ['{}'])[0])
+        elif path == 'agendar' and query_params.get('data'):
+            dados = json.loads(query_params.get('data', ['{}'])[0])
             db.inserir_agendamento(dados)
             st.json({'success': True})
             st.stop()
         
-        elif path == 'atualizar_status' and st.query_params.get('data'):
-            dados = json.loads(st.query_params.get('data', ['{}'])[0])
+        elif path == 'atualizar_status' and query_params.get('data'):
+            dados = json.loads(query_params.get('data', ['{}'])[0])
             db.atualizar_status(dados['id'], dados['status'])
             st.json({'success': True})
             st.stop()
         
-        elif path == 'despesa' and st.query_params.get('data'):
-            dados = json.loads(st.query_params.get('data', ['{}'])[0])
+        elif path == 'despesa' and query_params.get('data'):
+            dados = json.loads(query_params.get('data', ['{}'])[0])
             db.inserir_despesa(dados['descricao'], dados['valor'], dados['categoria'], dados['data'])
             st.json({'success': True})
             st.stop()
 
 # ==================== MAIN ====================
 # Processar requisições API
-query_params = st.query_params
-if 'api_path' in query_params:
-    handle_api()
+process_api()
 
 # Exibir HTML completo
-html_content = get_html_content()
-st.components.v1.html(html_content, height=1000, scrolling=True)
+st.components.v1.html(HTML_TEMPLATE, height=800, scrolling=True)
