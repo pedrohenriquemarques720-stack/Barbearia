@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Barbearia GoldCutz | Gestão Profissional</title>
+    <title>Du Cortz Barbearia | Sistema Completo</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome 6 (ícones robustos) -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Configuração custom do Tailwind para tema Dark + dourado -->
+    <!-- Flatpickr para calendário -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     <style>
-        /* Customizações globais e animações */
         * {
             transition: all 0.2s ease;
         }
@@ -18,7 +20,6 @@
             background: #0a0a0a;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
         }
-        /* Scrollbar customizada */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -30,7 +31,6 @@
             background: #c9a03d;
             border-radius: 10px;
         }
-        /* Animações de entrada para modais */
         @keyframes fadeSlide {
             from {
                 opacity: 0;
@@ -44,478 +44,457 @@
         .modal-active {
             animation: fadeSlide 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
         }
-        /* Botões e cards com hover suave */
-        .hover-gold {
-            transition: all 0.2s;
-        }
         .hover-gold:hover {
             background-color: rgba(201, 160, 61, 0.15);
             border-color: #c9a03d;
         }
-        /* custom para status badges */
-        .badge-pulse {
-            box-shadow: 0 0 0 0 rgba(201, 160, 61, 0.7);
-            animation: pulse-gold 1.5s infinite;
+        .flatpickr-calendar {
+            background: #1a1a1a !important;
+            border: 1px solid #c9a03d !important;
+            border-radius: 20px !important;
         }
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 0 0 rgba(201, 160, 61, 0.5); }
-            70% { box-shadow: 0 0 0 6px rgba(201, 160, 61, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(201, 160, 61, 0); }
+        .flatpickr-calendar .flatpickr-day.selected {
+            background: #c9a03d !important;
+            color: #0a0a0a !important;
         }
-        /* touch-friendly */
-        button, .clickable {
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
+        .tab-active {
+            background: #c9a03d !important;
+            color: #0a0a0a !important;
+        }
+        .btn-admin {
+            background: linear-gradient(135deg, #c9a03d, #b8860b);
+        }
+        /* Estilo para inputs de data/hora ocupados */
+        .time-slot-taken {
+            background-color: rgba(201, 160, 61, 0.2);
+            color: #c9a03d;
+            cursor: not-allowed;
         }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-gray-200 antialiased">
+<body class="bg-[#0a0a0a] text-gray-200">
 
-    <!-- Conteúdo principal -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 pb-24 md:pb-8">
-        
-        <!-- Cabeçalho com identidade -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-8 border-b border-[#c9a03d]/30 pb-4">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-[#e6c88a] to-[#b8860b] bg-clip-text text-transparent">
-                    <i class="fas fa-scissors mr-2 text-[#c9a03d]"></i> GoldCutz
-                </h1>
-                <p class="text-xs text-gray-400 tracking-wider mt-1">BARBER SHOP · GESTÃO PROFISSIONAL</p>
-            </div>
-            <div class="flex gap-2">
-                <button id="openQuickBookBtn" class="bg-[#c9a03d] hover:bg-[#dbb24e] text-black font-bold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition text-sm md:text-base">
-                    <i class="fas fa-plus-circle"></i> <span>Agendar Rápido</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Dashboard Rápido (cards) -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <!-- Próximo Cliente -->
-            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl hover:border-[#c9a03d]/60 transition">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-400 text-sm uppercase tracking-wider">Próximo Cliente</p>
-                        <p id="nextCustomerName" class="text-2xl font-bold text-white mt-1">—</p>
-                        <p id="nextCustomerTime" class="text-xs text-[#c9a03d] mt-1">aguardando</p>
-                    </div>
-                    <i class="fas fa-user-clock text-4xl text-[#c9a03d]/60"></i>
+    <!-- Barra de Navegação Principal -->
+    <nav class="bg-black/80 backdrop-blur-md border-b border-[#c9a03d]/30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-cut text-2xl text-[#c9a03d]"></i>
+                    <span class="text-xl font-bold bg-gradient-to-r from-[#e6c88a] to-[#b8860b] bg-clip-text text-transparent">Du Cortz</span>
                 </div>
-            </div>
-            <!-- Cadeiras Ocupadas -->
-            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-400 text-sm uppercase tracking-wider">Cadeiras Ocupadas</p>
-                        <p id="chairsOccupied" class="text-2xl font-bold text-white mt-1">0</p>
-                        <p class="text-xs text-gray-500">de 4 cadeiras</p>
-                    </div>
-                    <i class="fas fa-chair text-4xl text-[#c9a03d]/60"></i>
-                </div>
-            </div>
-            <!-- Ganhos do Dia -->
-            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-400 text-sm uppercase tracking-wider">Ganhos do Dia</p>
-                        <p id="dailyEarnings" class="text-2xl font-bold text-[#c9a03d] mt-1">R$ 0</p>
-                        <p class="text-xs text-gray-500">em serviços</p>
-                    </div>
-                    <i class="fas fa-coins text-4xl text-[#c9a03d]/60"></i>
+                <div class="flex gap-2">
+                    <button onclick="switchMainTab('cliente')" id="tabClienteBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">👤 Cliente</button>
+                    <button onclick="switchMainTab('agenda')" id="tabAgendaBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">📅 Agenda</button>
+                    <button onclick="openAdminLogin()" id="tabAdminBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">
+                        <i class="fas fa-lock"></i> Admin
+                    </button>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <!-- Timeline de Agendamentos + Controle de Status -->
-        <div class="bg-black/40 backdrop-blur-sm rounded-2xl border border-gray-800 p-4 md:p-6 shadow-2xl">
-            <div class="flex flex-wrap justify-between items-center mb-5 gap-2">
-                <h2 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-clock text-[#c9a03d]"></i> Agenda Hoje · Timeline</h2>
-                <span class="text-xs bg-gray-800 px-3 py-1 rounded-full text-gray-300">clique no status para alterar</span>
-            </div>
-            <div id="timelineContainer" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-                <!-- Lista dinâmica via JS -->
-                <div class="text-center text-gray-500 py-8">carregando agendamentos...</div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <!-- TELA DO CLIENTE -->
+        <div id="clientePanel" class="main-panel">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Formulário de Agendamento -->
+                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
+                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-calendar-plus text-[#c9a03d]"></i> Faça seu Agendamento</h2>
+                    <form id="clientBookingForm">
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Seu Nome</label>
+                            <input type="text" id="clientName" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Telefone</label>
+                            <input type="tel" id="clientPhone" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Data</label>
+                            <input type="text" id="clientDate" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white cursor-pointer" placeholder="Selecione a data" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Horário</label>
+                            <select id="clientTime" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white">
+                                <!-- Preenchido via JS -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm mb-1">Serviço</label>
+                            <select id="clientService" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white">
+                                <option value="Corte|45">✂️ Corte - R$ 45</option>
+                                <option value="Barba|35">🧔 Barba - R$ 35</option>
+                                <option value="Combo|70">🔥 Combo (Corte+Barba) - R$ 70</option>
+                                <option value="Navalha|55">🪒 Navalha Premium - R$ 55</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-[#c9a03d] text-black font-bold py-2 rounded-xl">Confirmar Agendamento</button>
+                    </form>
+                </div>
+
+                <!-- Meus Agendamentos (Cliente) -->
+                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
+                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-list-alt text-[#c9a03d]"></i> Meus Agendamentos</h2>
+                    <div id="myAppointmentsList" class="space-y-2 max-h-[400px] overflow-y-auto">
+                        <p class="text-gray-400 text-center">Nenhum agendamento encontrado</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </main>
 
-    <!-- MODAL QUICK BOOKING (Formulário de adição) -->
-    <div id="bookingModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-all duration-300 p-4">
-        <div class="bg-[#111111] rounded-3xl max-w-md w-full border border-[#c9a03d]/40 shadow-2xl modal-active overflow-hidden">
-            <div class="flex justify-between items-center p-5 border-b border-gray-800">
-                <h3 class="text-2xl font-bold flex gap-2"><i class="fas fa-cut text-[#c9a03d]"></i> Novo Agendamento</h3>
-                <button id="closeModalBtn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        <!-- TELA DE AGENDA PÚBLICA (Visualização Geral) -->
+        <div id="agendaPanel" class="main-panel hidden">
+            <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h2 class="text-2xl font-bold"><i class="fas fa-calendar-alt text-[#c9a03d]"></i> Agenda do Barbeiro</h2>
+                    <div class="flex gap-2">
+                        <button onclick="changePublicDate(-1)" class="bg-gray-800 px-3 py-1 rounded-full"><i class="fas fa-chevron-left"></i></button>
+                        <span id="publicDateLabel" class="text-[#c9a03d] font-mono"></span>
+                        <button onclick="changePublicDate(1)" class="bg-gray-800 px-3 py-1 rounded-full"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="setPublicToday()" class="bg-[#c9a03d]/20 px-3 py-1 rounded-full text-sm">Hoje</button>
+                    </div>
+                </div>
+                <div id="publicScheduleList" class="space-y-2 max-h-[500px] overflow-y-auto">
+                    <!-- Lista dinâmica -->
+                </div>
             </div>
-            <div class="p-5 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Nome do Cliente</label>
-                    <input type="text" id="bookingName" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d] focus:outline-none" placeholder="Ex: João Silva">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Serviço</label>
-                    <select id="bookingService" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d]">
-                        <option value="Corte">✂️ Corte - R$ 45</option>
-                        <option value="Barba">🧔 Barba - R$ 35</option>
-                        <option value="Combo">🔥 Combo (Corte + Barba) - R$ 70</option>
-                        <option value="Navalha">🪒 Navalha Premium - R$ 55</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">Horário (HH:MM)</label>
-                    <input type="time" id="bookingTime" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d]" value="15:00">
-                </div>
-                <!-- Controle de comanda: seletor de serviços com soma automática (adicional) -->
-                <div class="bg-gray-900/60 rounded-xl p-3 border border-gray-800">
-                    <p class="text-sm font-semibold text-[#c9a03d] mb-2"><i class="fas fa-receipt"></i> Comanda Rápida (adicione extras)</p>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <button type="button" data-extra="Corte" data-price="45" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Corte (R$45)</button>
-                        <button type="button" data-extra="Barba" data-price="35" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Barba (R$35)</button>
-                        <button type="button" data-extra="Hidratação" data-price="25" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Hidratação (R$25)</button>
+        </div>
+
+        <!-- MODAL DE LOGIN ADMIN -->
+        <div id="adminLoginModal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 hidden">
+            <div class="bg-[#111111] rounded-2xl p-6 max-w-md w-full border border-[#c9a03d]">
+                <h2 class="text-2xl font-bold mb-4"><i class="fas fa-crown text-[#c9a03d]"></i> Acesso Admin</h2>
+                <input type="text" id="adminUser" placeholder="Usuário" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white">
+                <input type="password" id="adminPass" placeholder="Senha" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white">
+                <button onclick="doAdminLogin()" class="w-full bg-[#c9a03d] text-black font-bold py-2 rounded-xl">Entrar</button>
+                <button onclick="closeAdminLogin()" class="w-full mt-2 text-gray-400">Cancelar</button>
+                <p id="loginErrorMsg" class="text-red-400 text-sm mt-2 hidden"></p>
+            </div>
+        </div>
+
+        <!-- TELA ADMIN (Após Login) -->
+        <div id="adminPanel" class="main-panel hidden">
+            <div class="space-y-6">
+                <!-- Cards Financeiros -->
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
+                        <p class="text-gray-300 text-sm">💰 Ganhos Hoje</p>
+                        <p id="adminDailyEarning" class="text-3xl font-bold text-[#c9a03d]">R$ 0</p>
                     </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-400">Total do serviço + extras:</span>
-                        <span id="dynamicTotalDisplay" class="text-xl font-bold text-[#c9a03d]">R$ 0</span>
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
+                        <p class="text-gray-300 text-sm">📊 Receita do Mês</p>
+                        <p id="adminMonthlyEarning" class="text-3xl font-bold text-[#c9a03d]">R$ 0</p>
                     </div>
-                    <input type="hidden" id="totalPriceHidden" value="0">
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
+                        <p class="text-gray-300 text-sm">🎯 Total de Cortes</p>
+                        <p id="adminTotalCuts" class="text-3xl font-bold text-[#c9a03d]">0</p>
+                    </div>
                 </div>
-                <button id="confirmBookingBtn" class="w-full bg-[#c9a03d] hover:bg-[#b8860b] text-black font-bold py-3 rounded-xl mt-2 transition flex items-center justify-center gap-2">
-                    <i class="fas fa-check-circle"></i> Confirmar Agendamento
-                </button>
+
+                <!-- Indicadores Mensais -->
+                <div class="bg-black/50 rounded-2xl p-5 border border-gray-800">
+                    <h3 class="text-xl font-bold mb-3"><i class="fas fa-chart-line text-[#c9a03d]"></i> Indicadores do Mês</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div><p class="text-gray-400 text-xs">Média Diária</p><p id="adminAvgDaily" class="text-lg font-bold text-[#c9a03d]">R$ 0</p></div>
+                        <div><p class="text-gray-400 text-xs">Ticket Médio</p><p id="adminAvgTicket" class="text-lg font-bold text-[#c9a03d]">R$ 0</p></div>
+                        <div><p class="text-gray-400 text-xs">Agendamentos Mês</p><p id="adminMonthlyCount" class="text-lg font-bold text-[#c9a03d]">0</p></div>
+                        <div><p class="text-gray-400 text-xs">Cancelamentos</p><p id="adminCancelledCount" class="text-lg font-bold text-red-400">0</p></div>
+                    </div>
+                </div>
+
+                <!-- Controles de Agenda Admin -->
+                <div class="bg-black/50 rounded-2xl p-5 border border-gray-800">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="text-xl font-bold"><i class="fas fa-clipboard-list"></i> Gerenciar Agendamentos</h3>
+                        <button onclick="showAdminBookingForm()" class="bg-[#c9a03d] text-black px-4 py-1 rounded-full text-sm"><i class="fas fa-plus"></i> Agendar Manual</button>
+                    </div>
+                    <div id="adminScheduleList" class="space-y-2 max-h-[500px] overflow-y-auto"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ---------- ESTADO GLOBAL ----------
-        // Estrutura dos agendamentos: cada item possui id, nome, horario, servico, precoTotal, status (pending, completed, late, canceled)
-        let appointments = [
-            { id: "a1", nome: "Carlos André", horario: "09:00", servico: "Combo", precoTotal: 70, status: "pending" },
-            { id: "a2", nome: "Rafael M.", horario: "10:30", servico: "Corte", precoTotal: 45, status: "pending" },
-            { id: "a3", nome: "Thiago Lima", horario: "12:00", servico: "Barba", precoTotal: 35, status: "pending" },
-            { id: "a4", nome: "Fernanda (Cliente)", horario: "14:15", servico: "Navalha", precoTotal: 55, status: "pending" },
-            { id: "a5", nome: "Matheus Gold", horario: "16:00", servico: "Combo", precoTotal: 70, status: "pending" },
-            { id: "a6", nome: "João Pedro", horario: "17:30", servico: "Corte", precoTotal: 45, status: "pending" }
-        ];
+        // ========== DADOS GLOBAIS ==========
+        let appointments = [];
+        let currentPublicDate = new Date().toISOString().split('T')[0];
+        let adminLoggedIn = false;
 
-        // Variáveis de estado auxiliares
-        let chairsOccupied = 2;  // Simulação: cadeiras ocupadas (baseado em status "completed"? mas usaremos para demo)
-        // Regra de negócio: "Cadeiras Ocupadas" serão contadas como agendamentos com status "pending" (atendendo agora) + completed recente? melhor lógica: pending = aguardando/em atendimento
-        // mas para fluidez: ocupação baseada em pending (horários próximos) + completed do dia, vamos customizar: para fins de UI: pending e late representam ocupação
-        function updateOccupiedChairs() {
-            const now = new Date();
-            const currentHourMin = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
-            // Conta agendamentos com horário menor ou igual ao atual + status pending ou late (simula ocupação)
-            let ocupadas = appointments.filter(app => {
-                if(app.status === 'canceled') return false;
-                if(app.status === 'completed') return false;
-                // se status pending ou late ou se horário <= agora e não concluído
-                const appTime = app.horario;
-                if(appTime <= currentHourMin && (app.status === 'pending' || app.status === 'late')) return true;
-                return (app.status === 'pending' || app.status === 'late');
-            }).length;
-            // limite de 4 cadeiras
-            chairsOccupied = Math.min(ocupadas, 4);
-            document.getElementById('chairsOccupied').innerText = chairsOccupied;
-        }
-
-        // calcular ganhos do dia (soma de todos os agendamentos com status completed)
-        function calculateDailyEarnings() {
-            const todayStr = new Date().toISOString().slice(0,10);
-            // como não temos data completa, usamos completed independente do dia (para demo foco diário)
-            const earnings = appointments.filter(app => app.status === 'completed').reduce((sum, app) => sum + (app.precoTotal || 0), 0);
-            document.getElementById('dailyEarnings').innerHTML = `R$ ${earnings.toFixed(2)}`;
-            return earnings;
-        }
-
-        // Atualizar "Próximo Cliente": o agendamento pendente (pending/late) com horário mais próximo (ordem crescente)
-        function updateNextCustomer() {
-            const nowTime = getCurrentTimeString();
-            const pendingApps = appointments.filter(app => app.status !== 'completed' && app.status !== 'canceled')
-                .sort((a,b) => a.horario.localeCompare(b.horario));
-            let next = pendingApps[0];
-            if(next) {
-                document.getElementById('nextCustomerName').innerText = next.nome;
-                document.getElementById('nextCustomerTime').innerHTML = `<i class="fas fa-hourglass-half"></i> ${next.horario} · ${next.servico}`;
+        // Carregar dados do localStorage
+        function loadData() {
+            const stored = localStorage.getItem('ducortz_appointments');
+            if(stored) {
+                appointments = JSON.parse(stored);
             } else {
-                document.getElementById('nextCustomerName').innerText = "🏆 Dia finalizado";
-                document.getElementById('nextCustomerTime').innerHTML = "Nenhum pendente";
+                // Dados de exemplo
+                const today = new Date().toISOString().split('T')[0];
+                const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                appointments = [
+                    { id: "1", nome: "Carlos Silva", telefone: "(11) 99999-1111", data: today, horario: "10:00", servico: "Combo", preco: 70, status: "pending" },
+                    { id: "2", nome: "Rafael Souza", telefone: "(11) 98888-2222", data: today, horario: "14:30", servico: "Corte", preco: 45, status: "pending" },
+                    { id: "3", nome: "João Pedro", telefone: "(11) 97777-3333", data: tomorrow, horario: "09:00", servico: "Barba", preco: 35, status: "pending" },
+                    { id: "4", nome: "Lucas Mendes", telefone: "(11) 96666-4444", data: tomorrow, horario: "16:00", servico: "Navalha", preco: 55, status: "pending" }
+                ];
+                saveData();
             }
+            updateTimeSlots();
         }
 
-        function getCurrentTimeString() {
-            const d = new Date();
-            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        function saveData() {
+            localStorage.setItem('ducortz_appointments', JSON.stringify(appointments));
         }
 
-        // Função para verificar atrasados (horário < agora e status pending)
-        function checkLateAppointments() {
-            const now = getCurrentTimeString();
-            let changed = false;
-            appointments.forEach(app => {
-                if(app.status === 'pending' && app.horario < now) {
-                    app.status = 'late';
-                    changed = true;
+        // Obter horários ocupados para uma data
+        function getOccupiedTimes(date) {
+            return appointments.filter(a => a.data === date && a.status !== 'canceled').map(a => a.horario);
+        }
+
+        // Atualizar select de horários no cliente
+        function updateTimeSlots() {
+            const date = document.getElementById('clientDate')?.value;
+            if(!date) return;
+            const occupied = getOccupiedTimes(date);
+            const timeSelect = document.getElementById('clientTime');
+            const times = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','13:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00'];
+            timeSelect.innerHTML = '';
+            times.forEach(t => {
+                const option = document.createElement('option');
+                option.value = t;
+                option.textContent = t;
+                if(occupied.includes(t)) {
+                    option.disabled = true;
+                    option.classList.add('time-slot-taken');
+                    option.textContent = t + ' ❌ Ocupado';
                 }
-            });
-            if(changed) {
-                renderTimeline();
-                updateDashboard();
-            }
-        }
-
-        // Renderização da timeline com interação para alterar status (Concluído, Atrasado, Cancelar)
-        function renderTimeline() {
-            const container = document.getElementById('timelineContainer');
-            if(!container) return;
-            const sorted = [...appointments].sort((a,b) => a.horario.localeCompare(b.horario));
-            if(sorted.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 py-8 bg-gray-900/30 rounded-2xl"><i class="fas fa-calendar-day"></i> Nenhum agendamento hoje</div>`;
-                return;
-            }
-            let html = '';
-            sorted.forEach(app => {
-                let statusConfig = {
-                    bg: 'bg-gray-800',
-                    icon: 'fa-hourglass-half',
-                    label: 'Pendente',
-                    textColor: 'text-gray-300'
-                };
-                if(app.status === 'completed') {
-                    statusConfig = { bg: 'bg-green-900/40', icon: 'fa-check-circle', label: 'Concluído', textColor: 'text-green-400', borderColor: 'border-green-600/40' };
-                } else if(app.status === 'late') {
-                    statusConfig = { bg: 'bg-red-900/40', icon: 'fa-exclamation-triangle', label: 'Atrasado', textColor: 'text-red-400', borderColor: 'border-red-600/40' };
-                } else if(app.status === 'canceled') {
-                    statusConfig = { bg: 'bg-gray-800/60', icon: 'fa-ban', label: 'Cancelado', textColor: 'text-gray-500', borderColor: 'border-gray-700' };
-                } else {
-                    statusConfig.borderColor = 'border-[#c9a03d]/30';
-                }
-                const borderClass = app.status === 'canceled' ? 'border-gray-700' : (app.status === 'completed' ? 'border-green-600/40' : (app.status === 'late' ? 'border-red-600/40' : 'border-l-[#c9a03d]'));
-                html += `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-900/60 rounded-2xl p-4 border-l-4 ${borderClass} hover-gold transition">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 flex-wrap">
-                                <span class="font-mono text-lg font-bold text-[#c9a03d]">${app.horario}</span>
-                                <h3 class="font-bold text-white text-lg">${escapeHtml(app.nome)}</h3>
-                                <span class="text-sm bg-gray-800 px-2 py-0.5 rounded-full">${escapeHtml(app.servico)}</span>
-                            </div>
-                            <div class="text-gray-400 text-sm mt-1">💰 Valor: R$ ${app.precoTotal.toFixed(2)}</div>
-                        </div>
-                        <div class="flex gap-2 items-center flex-wrap">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${statusConfig.bg} ${statusConfig.textColor}">
-                                <i class="fas ${statusConfig.icon}"></i> ${statusConfig.label}
-                            </span>
-                            ${app.status !== 'canceled' ? `
-                            <div class="flex gap-1">
-                                <button data-id="${app.id}" data-action="complete" class="bg-green-800/40 hover:bg-green-700 text-green-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold transition"><i class="fas fa-check"></i> Concluir</button>
-                                <button data-id="${app.id}" data-action="late" class="bg-red-800/40 hover:bg-red-700 text-red-300 hover:text-white px-3 py-1.5 rounded-full text-xs"><i class="fas fa-clock"></i> Atrasado</button>
-                                <button data-id="${app.id}" data-action="cancel" class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1.5 rounded-full text-xs"><i class="fas fa-times"></i> Cancelar</button>
-                            </div>
-                            ` : `
-                            <span class="text-xs text-gray-500"><i class="fas fa-trash"></i> Cancelado</span>
-                            `}
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-            // Adiciona event listeners para os botões dinâmicos
-            document.querySelectorAll('[data-action="complete"]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.getAttribute('data-id');
-                    changeAppointmentStatus(id, 'completed');
-                });
-            });
-            document.querySelectorAll('[data-action="late"]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.getAttribute('data-id');
-                    changeAppointmentStatus(id, 'late');
-                });
-            });
-            document.querySelectorAll('[data-action="cancel"]').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = btn.getAttribute('data-id');
-                    changeAppointmentStatus(id, 'canceled');
-                });
+                timeSelect.appendChild(option);
             });
         }
 
-        function changeAppointmentStatus(id, newStatus) {
-            const app = appointments.find(a => a.id === id);
-            if(app) {
-                if(newStatus === 'completed' && app.status === 'completed') return;
-                if(newStatus === 'canceled' && app.status === 'canceled') return;
-                app.status = newStatus;
-                // Se for concluído, ganhos do dia atualizam
-                renderTimeline();
-                updateDashboard();
-                // Feedback visual sutil
-                showToast(`Status alterado para ${newStatus === 'completed' ? 'Concluído' : (newStatus === 'late' ? 'Atrasado' : 'Cancelado')}`);
-            }
-        }
-
-        function updateDashboard() {
-            updateOccupiedChairs();
-            calculateDailyEarnings();
-            updateNextCustomer();
-        }
-
-        // Adicionar novo agendamento (Quick Booking)
-        function addAppointment(nome, servicoRaw, horario, precoTotal) {
-            // mapeamento de nome amigável
-            let servicoNome = servicoRaw;
-            if(servicoRaw.includes('Corte')) servicoNome = 'Corte';
-            else if(servicoRaw.includes('Barba') && !servicoRaw.includes('Combo')) servicoNome = 'Barba';
-            else if(servicoRaw.includes('Combo')) servicoNome = 'Combo';
-            else if(servicoRaw.includes('Navalha')) servicoNome = 'Navalha';
-            const newId = 'id_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
-            const novoApp = {
-                id: newId,
-                nome: nome.trim(),
-                horario: horario,
+        // Agendamento do Cliente
+        document.getElementById('clientBookingForm')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('clientName').value.trim();
+            const telefone = document.getElementById('clientPhone').value.trim();
+            const data = document.getElementById('clientDate').value;
+            const horario = document.getElementById('clientTime').value;
+            const servicoRaw = document.getElementById('clientService').value;
+            const [servicoNome, precoStr] = servicoRaw.split('|');
+            const preco = parseFloat(precoStr);
+            
+            if(!nome || !telefone || !data || !horario) { alert('Preencha todos os campos'); return; }
+            
+            const occupied = getOccupiedTimes(data);
+            if(occupied.includes(horario)) { alert('❌ Horário já ocupado!'); return; }
+            
+            const newApp = {
+                id: Date.now().toString(),
+                nome, telefone, data, horario,
                 servico: servicoNome,
-                precoTotal: precoTotal,
+                preco: preco,
                 status: 'pending'
             };
-            // verificar conflito de horário (não permite duplicado)
-            const conflito = appointments.some(app => app.horario === horario && app.status !== 'canceled');
-            if(conflito) {
-                alert('❌ Horário já ocupado por outro agendamento ativo! Escolha outro horário.');
-                return false;
+            appointments.push(newApp);
+            saveData();
+            alert('✅ Agendamento confirmado!');
+            document.getElementById('clientBookingForm').reset();
+            document.getElementById('clientDate').value = '';
+            updateTimeSlots();
+            renderMyAppointments(nome, telefone);
+            if(adminLoggedIn) renderAdminSchedule();
+            renderPublicSchedule();
+        });
+
+        // Renderizar "Meus Agendamentos" baseado no telefone
+        function renderMyAppointments(nomeFilter = '', phoneFilter = '') {
+            const container = document.getElementById('myAppointmentsList');
+            const phone = phoneFilter || document.getElementById('clientPhone')?.value;
+            if(!phone) { container.innerHTML = '<p class="text-gray-400 text-center">Digite seu telefone e agende para ver seus horários</p>'; return; }
+            const userApps = appointments.filter(a => a.telefone === phone && a.status !== 'canceled');
+            if(userApps.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center">Nenhum agendamento encontrado para este telefone</p>';
+                return;
             }
-            appointments.push(novoApp);
-            renderTimeline();
-            updateDashboard();
-            return true;
+            container.innerHTML = userApps.map(app => `
+                <div class="bg-gray-900 rounded-xl p-3 border-l-4 border-[#c9a03d]">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-bold">${app.servico}</p>
+                            <p class="text-sm text-gray-400">📅 ${formatDate(app.data)} às ${app.horario}</p>
+                        </div>
+                        <span class="text-xs ${app.status === 'completed' ? 'text-green-400' : 'text-[#c9a03d]'}">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
+                    </div>
+                    <button onclick="cancelClientApp('${app.id}')" class="text-red-400 text-xs mt-2 hover:text-red-300">Cancelar agendamento</button>
+                </div>
+            `).join('');
         }
 
-        // Helper escapar HTML
-        function escapeHtml(str) {
-            if(!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if(m === '&') return '&amp;';
-                if(m === '<') return '&lt;';
-                if(m === '>') return '&gt;';
-                return m;
-            });
+        function cancelClientApp(id) {
+            if(confirm('Cancelar este agendamento?')) {
+                appointments = appointments.filter(a => a.id !== id);
+                saveData();
+                renderMyAppointments('', document.getElementById('clientPhone')?.value);
+                if(adminLoggedIn) renderAdminSchedule();
+                renderPublicSchedule();
+                updateTimeSlots();
+                alert('Agendamento cancelado');
+            }
         }
 
-        // Toast simples customizado
-        function showToast(msg) {
-            let toastDiv = document.createElement('div');
-            toastDiv.className = 'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#c9a03d] text-black font-bold px-5 py-2 rounded-full shadow-xl text-sm z-50 flex items-center gap-2 animate-bounce';
-            toastDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
-            document.body.appendChild(toastDiv);
-            setTimeout(() => {
-                toastDiv.remove();
-            }, 2000);
+        // Agenda Pública
+        function renderPublicSchedule() {
+            const container = document.getElementById('publicScheduleList');
+            const filtered = appointments.filter(a => a.data === currentPublicDate && a.status !== 'canceled').sort((a,b) => a.horario.localeCompare(b.horario));
+            document.getElementById('publicDateLabel').innerText = formatDate(currentPublicDate);
+            if(filtered.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">Nenhum agendamento para esta data</p>';
+                return;
+            }
+            container.innerHTML = filtered.map(app => `
+                <div class="bg-gray-900 rounded-xl p-3 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <p class="font-bold">${app.nome}</p>
+                        <p class="text-sm text-gray-400">${app.servico} • ${app.horario}</p>
+                    </div>
+                    <span class="text-xs bg-[#c9a03d]/20 px-2 py-1 rounded-full">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
+                </div>
+            `).join('');
         }
 
-        // ---------- LÓGICA DE COMANDA (soma automática dos valores) ----------
-        function setupCommandLogic() {
-            const serviceSelect = document.getElementById('bookingService');
-            const extraBtns = document.querySelectorAll('.extra-service-btn');
-            let currentExtrasTotal = 0;
-            let basePrice = 0;
+        function changePublicDate(delta) {
+            const newDate = new Date(currentPublicDate);
+            newDate.setDate(newDate.getDate() + delta);
+            currentPublicDate = newDate.toISOString().split('T')[0];
+            renderPublicSchedule();
+        }
+        function setPublicToday() { currentPublicDate = new Date().toISOString().split('T')[0]; renderPublicSchedule(); }
+
+        // ADMIN
+        function openAdminLogin() { document.getElementById('adminLoginModal').classList.remove('hidden'); }
+        function closeAdminLogin() { document.getElementById('adminLoginModal').classList.add('hidden'); }
+        function doAdminLogin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            if(user === 'adm123' && pass === '123adm') {
+                adminLoggedIn = true;
+                closeAdminLogin();
+                switchMainTab('admin');
+                renderAdminDashboard();
+                renderAdminSchedule();
+            } else {
+                document.getElementById('loginErrorMsg').classList.remove('hidden');
+                document.getElementById('loginErrorMsg').innerText = 'Usuário ou senha incorretos';
+            }
+        }
+
+        function renderAdminDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
             
-            function getBasePriceFromSelect() {
-                const val = serviceSelect.value;
-                if(val === 'Corte') return 45;
-                if(val === 'Barba') return 35;
-                if(val === 'Combo') return 70;
-                if(val === 'Navalha') return 55;
-                return 45;
-            }
-            function updateTotal() {
-                basePrice = getBasePriceFromSelect();
-                const total = basePrice + currentExtrasTotal;
-                document.getElementById('dynamicTotalDisplay').innerHTML = `R$ ${total.toFixed(2)}`;
-                document.getElementById('totalPriceHidden').value = total;
-            }
-            serviceSelect.addEventListener('change', () => updateTotal());
-            extraBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const price = parseFloat(btn.getAttribute('data-price'));
-                    currentExtrasTotal += price;
-                    updateTotal();
-                    // feedback visual
-                    btn.classList.add('bg-[#c9a03d]', 'text-black');
-                    setTimeout(() => btn.classList.remove('bg-[#c9a03d]', 'text-black'), 200);
-                });
+            const todayApps = appointments.filter(a => a.data === today && a.status === 'completed');
+            const dailyEarning = todayApps.reduce((s, a) => s + a.preco, 0);
+            document.getElementById('adminDailyEarning').innerText = `R$ ${dailyEarning.toFixed(2)}`;
+            
+            const monthApps = appointments.filter(a => {
+                const [year, month] = a.data.split('-');
+                return parseInt(year) === currentYear && parseInt(month) === (currentMonth + 1) && a.status === 'completed';
             });
-            updateTotal();
-            // retornar função para pegar total atual
-            return () => parseFloat(document.getElementById('totalPriceHidden').value);
+            const monthlyEarning = monthApps.reduce((s, a) => s + a.preco, 0);
+            document.getElementById('adminMonthlyEarning').innerText = `R$ ${monthlyEarning.toFixed(2)}`;
+            document.getElementById('adminTotalCuts').innerText = monthApps.length;
+            
+            const daysWorked = [...new Set(monthApps.map(a => a.data))].length;
+            const avgDaily = daysWorked > 0 ? monthlyEarning / daysWorked : 0;
+            const avgTicket = monthApps.length > 0 ? monthlyEarning / monthApps.length : 0;
+            const cancelledCount = appointments.filter(a => {
+                const [year, month] = a.data.split('-');
+                return parseInt(year) === currentYear && parseInt(month) === (currentMonth + 1) && a.status === 'canceled';
+            }).length;
+            
+            document.getElementById('adminAvgDaily').innerText = `R$ ${avgDaily.toFixed(2)}`;
+            document.getElementById('adminAvgTicket').innerText = `R$ ${avgTicket.toFixed(2)}`;
+            document.getElementById('adminMonthlyCount').innerText = monthApps.length;
+            document.getElementById('adminCancelledCount').innerText = cancelledCount;
         }
 
-        // Modal e eventos
-        const modal = document.getElementById('bookingModal');
-        const openBtn = document.getElementById('openQuickBookBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const confirmBtn = document.getElementById('confirmBookingBtn');
-        let getTotalValue = null;
-
-        function initModal() {
-            getTotalValue = setupCommandLogic();
-            openBtn.onclick = () => {
-                modal.classList.remove('hidden');
-                // reset básico
-                document.getElementById('bookingName').value = '';
-                document.getElementById('bookingService').value = 'Combo';
-                document.getElementById('bookingTime').value = '15:00';
-                // reset extras dinamicamente, recriar lógica ou apenas redefinir
-                // melhor: recarregar estado da comanda
-                const serviceSelect = document.getElementById('bookingService');
-                serviceSelect.dispatchEvent(new Event('change'));
-                // limpar total extras do display, mas a função já atualiza;
-                // Forçar novo cálculo
-                if(getTotalValue) getTotalValue = setupCommandLogic(); // reaplica
-                getTotalValue = setupCommandLogic();
-            };
-            closeModalBtn.onclick = () => modal.classList.add('hidden');
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) modal.classList.add('hidden');
-            });
-            confirmBtn.onclick = () => {
-                const nome = document.getElementById('bookingName').value.trim();
-                const servicoSelect = document.getElementById('bookingService');
-                const servicoTexto = servicoSelect.options[servicoSelect.selectedIndex].text;
-                const horario = document.getElementById('bookingTime').value;
-                if(!nome) {
-                    alert('Digite o nome do cliente');
-                    return;
-                }
-                if(!horario) {
-                    alert('Selecione um horário');
-                    return;
-                }
-                let totalPriceFinal = 0;
-                if(getTotalValue) totalPriceFinal = getTotalValue();
-                else totalPriceFinal = 70; // fallback
-                const success = addAppointment(nome, servicoTexto, horario, totalPriceFinal);
-                if(success) {
-                    modal.classList.add('hidden');
-                    showToast(`Agendado ${nome} às ${horario} - Total R$ ${totalPriceFinal}`);
-                }
-            };
+        function renderAdminSchedule() {
+            const container = document.getElementById('adminScheduleList');
+            const sorted = [...appointments].sort((a,b) => (a.data + a.horario).localeCompare(b.data + b.horario));
+            if(sorted.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhum agendamento</p>'; return; }
+            container.innerHTML = sorted.map(app => `
+                <div class="bg-gray-900 rounded-xl p-3 border-l-4 ${app.status === 'completed' ? 'border-green-500' : (app.status === 'canceled' ? 'border-red-500' : 'border-[#c9a03d]')}">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        <div>
+                            <p class="font-bold">${app.nome} <span class="text-xs text-gray-400">📞 ${app.telefone}</span></p>
+                            <p class="text-sm">📅 ${formatDate(app.data)} às ${app.horario} • ${app.servico} • R$ ${app.preco}</p>
+                            <p class="text-xs text-gray-400">Status: ${app.status === 'pending' ? '⏳ Pendente' : (app.status === 'completed' ? '✓ Concluído' : '✗ Cancelado')}</p>
+                        </div>
+                        <div class="flex gap-1">
+                            ${app.status !== 'completed' && app.status !== 'canceled' ? `<button onclick="adminComplete('${app.id}')" class="bg-green-600/30 hover:bg-green-600 px-2 py-1 rounded text-xs"><i class="fas fa-check"></i> Concluir</button>` : ''}
+                            ${app.status !== 'canceled' ? `<button onclick="adminCancel('${app.id}')" class="bg-red-600/30 hover:bg-red-600 px-2 py-1 rounded text-xs"><i class="fas fa-times"></i> Cancelar</button>` : ''}
+                            ${app.status === 'pending' ? `<button onclick="adminMarkLate('${app.id}')" class="bg-yellow-600/30 hover:bg-yellow-600 px-2 py-1 rounded text-xs"><i class="fas fa-clock"></i> Atrasado</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Inicializar e executar verificações de atrasados a cada minuto
+        function adminComplete(id) {
+            const app = appointments.find(a => a.id === id);
+            if(app) { app.status = 'completed'; saveData(); renderAdminSchedule(); renderAdminDashboard(); renderPublicSchedule(); updateTimeSlots(); renderMyAppointments('', app.telefone); }
+        }
+        function adminCancel(id) {
+            const app = appointments.find(a => a.id === id);
+            if(app && confirm('Cancelar este agendamento?')) { app.status = 'canceled'; saveData(); renderAdminSchedule(); renderAdminDashboard(); renderPublicSchedule(); updateTimeSlots(); renderMyAppointments('', app.telefone); }
+        }
+        function adminMarkLate(id) {
+            const app = appointments.find(a => a.id === id);
+            if(app) { app.status = 'late'; saveData(); renderAdminSchedule(); }
+        }
+        function showAdminBookingForm() {
+            const data = prompt('Data (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+            const horario = prompt('Horário (HH:MM):', '14:00');
+            const nome = prompt('Nome do cliente:');
+            const servico = prompt('Serviço (Corte/Barba/Combo/Navalha):', 'Corte');
+            const telefone = prompt('Telefone:');
+            if(data && horario && nome && servico) {
+                let preco = 45;
+                if(servico.toLowerCase().includes('barba') && !servico.toLowerCase().includes('combo')) preco = 35;
+                if(servico.toLowerCase().includes('combo')) preco = 70;
+                if(servico.toLowerCase().includes('navalha')) preco = 55;
+                const newApp = { id: Date.now().toString(), nome, telefone, data, horario, servico, preco, status: 'pending' };
+                appointments.push(newApp);
+                saveData();
+                renderAdminSchedule();
+                renderPublicSchedule();
+                updateTimeSlots();
+                alert('Agendamento adicionado!');
+            }
+        }
+
+        // Navegação entre telas
+        function switchMainTab(tab) {
+            document.getElementById('clientePanel').classList.add('hidden');
+            document.getElementById('agendaPanel').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            if(tab === 'cliente') document.getElementById('clientePanel').classList.remove('hidden');
+            if(tab === 'agenda') { document.getElementById('agendaPanel').classList.remove('hidden'); renderPublicSchedule(); }
+            if(tab === 'admin') {
+                if(adminLoggedIn) document.getElementById('adminPanel').classList.remove('hidden');
+                else { alert('Acesso negado! Faça login como admin.'); openAdminLogin(); }
+            }
+        }
+
+        function formatDate(dateStr) { if(!dateStr) return ''; const [y,m,d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
+
+        // Inicialização
         function init() {
-            renderTimeline();
-            updateDashboard();
-            initModal();
-            setInterval(() => {
-                checkLateAppointments();
-                updateDashboard();
-            }, 30000); // a cada 30s verifica atrasados
-            // auto marcação de atraso ao carregar
-            checkLateAppointments();
+            loadData();
+            const datePicker = flatpickr("#clientDate", { locale: 'pt', minDate: 'today', dateFormat: 'Y-m-d', onChange: (dates, dateStr) => { updateTimeSlots(); } });
+            document.getElementById('clientPhone')?.addEventListener('input', (e) => { renderMyAppointments('', e.target.value); });
+            renderPublicSchedule();
         }
         init();
     </script>
-    <!-- Rodapé sutil -->
-    <footer class="text-center text-gray-500 text-xs py-6 mt-4 border-t border-gray-800/40">
-        <i class="fas fa-cut"></i> GoldCutz Gestão · Modo Profissional · Status em tempo real
-    </footer>
 </body>
 </html>
