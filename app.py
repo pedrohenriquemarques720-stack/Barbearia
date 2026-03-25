@@ -1,12 +1,50 @@
 import streamlit as st
 import os
 
-# Configuração da página
+# Configuração da página - TELA CHEIA
 st.set_page_config(
     page_title="Du Cortz Barbearia",
     page_icon="✂️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+
+# CSS para remover paddings e margens do Streamlit - garantir tela cheia
+st.markdown("""
+    <style>
+        /* Remove padding e margens padrão do Streamlit */
+        .main .block-container {
+            padding: 0 !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+        
+        /* Esconde elementos padrão do Streamlit */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        
+        /* Remove qualquer espaço extra */
+        .stApp {
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Garante que o iframe ocupe toda a tela */
+        iframe {
+            width: 100% !important;
+            height: 100vh !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* Remove barras de rolagem desnecessárias */
+        body {
+            overflow: hidden;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # Função para ler o arquivo HTML
 def load_html():
@@ -20,27 +58,17 @@ def load_html():
     
     return html_content
 
-# Carrega e exibe o HTML
+# Carrega e exibe o HTML em tela cheia
 try:
     html_content = load_html()
     
-    # Remove qualquer estilo padrão do Streamlit que possa interferir
-    st.markdown("""
-        <style>
-            /* Remove padding e margens padrão do Streamlit */
-            .main .block-container {
-                padding: 0 !important;
-                max-width: 100% !important;
-            }
-            /* Esconde elementos padrão do Streamlit */
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-        </style>
-    """, unsafe_allow_html=True)
-    
-    # Renderiza o HTML completo
-    st.components.v1.html(html_content, height=800, scrolling=True)
+    # Renderiza o HTML completo ocupando toda a tela
+    st.components.v1.html(
+        html_content, 
+        height=1000,  # Altura grande para ocupar
+        scrolling=False,  # Desativa scroll do componente, deixa o HTML cuidar
+        width=1000
+    )
     
 except FileNotFoundError:
     st.error("❌ Arquivo 'index.html' não encontrado!")
@@ -49,9 +77,9 @@ except FileNotFoundError:
     # Mostra instruções
     with st.expander("📝 Como usar:"):
         st.markdown("""
-        1. Salve o código HTML fornecido anteriormente em um arquivo chamado `index.html`
+        1. Salve o código HTML fornecido em um arquivo chamado `index.html`
         2. Coloque este arquivo Python no mesmo diretório do `index.html`
-        3. Execute com: `streamlit run seu_arquivo.py`
+        3. Execute com: `streamlit run app.py`
         """)
         
 except Exception as e:
