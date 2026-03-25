@@ -2,991 +2,520 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Barbearia Du Cortz | Sistema Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Barbearia GoldCutz | Gestão Profissional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 6 (ícones robustos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Configuração custom do Tailwind para tema Dark + dourado -->
     <style>
+        /* Customizações globais e animações */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            transition: all 0.2s ease;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            position: relative;
+            background: #0a0a0a;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
         }
-
-        /* Overlay com imagem de fundo */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://images.unsplash.com/photo-1585747860714-2ba892e3d2b0?w=1600');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.12;
-            z-index: -1;
-        }
-
-        /* Top Navigation Premium */
-        .top-nav {
-            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 50%, #4a0a0a 100%);
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            border-bottom: 2px solid #FFD700;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo {
-            color: white;
-            font-size: 1.6rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .logo-text {
-            background: linear-gradient(135deg, #FFD700 0%, #FFFFFF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo span {
-            color: #FFD700;
-            -webkit-text-fill-color: #FFD700;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            background: rgba(0,0,0,0.6);
-            color: #FFD700;
-            border: 1px solid #FFD700;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s;
-            backdrop-filter: blur(5px);
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-            color: white;
-            border-color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(212,175,55,0.4);
-        }
-
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-            }
-            .nav-links {
-                justify-content: center;
-            }
-            .nav-btn {
-                padding: 8px 14px;
-                font-size: 12px;
-            }
-            .logo {
-                font-size: 1.3rem;
-            }
-        }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Glassmorphism Cards */
-        .card {
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(212,175,55,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(212,175,55,0.2);
-            border-color: rgba(212,175,55,0.6);
-        }
-
-        .card-title {
-            color: #FFD700;
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            font-weight: bold;
-            border-left: 4px solid #FFD700;
-            padding-left: 15px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* Grid System */
-        .grid-2, .grid-3, .grid-4 {
-            display: grid;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .grid-2 { grid-template-columns: repeat(2, 1fr); }
-        .grid-3 { grid-template-columns: repeat(3, 1fr); }
-        .grid-4 { grid-template-columns: repeat(4, 1fr); }
-
-        @media (max-width: 768px) {
-            .grid-2, .grid-3, .grid-4 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Metric Cards */
-        .metric-card {
-            background: linear-gradient(135deg, rgba(139,0,0,0.9) 0%, rgba(212,175,55,0.9) 100%);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            color: white;
-            border: 1px solid #FFD700;
-            transition: all 0.3s;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(212,175,55,0.4);
-        }
-
-        .metric-value {
-            font-size: 2.2rem;
-            font-weight: bold;
-            margin-top: 10px;
-            color: #FFD700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
-        /* Forms */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #FFD700;
-            font-weight: bold;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 14px;
-            background: rgba(42,42,42,0.9);
-            border: 2px solid #FFD700;
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #D4AF37;
-            background: rgba(0,0,0,0.9);
-            box-shadow: 0 0 10px rgba(212,175,55,0.5);
-        }
-
-        button {
-            background: linear-gradient(135deg, #D4AF37 0%, #8B0000 100%);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(212,175,55,0.4);
-        }
-
-        /* Services Grid */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .service-item {
-            background: rgba(42,42,42,0.9);
-            border: 2px solid #FFD700;
-            border-radius: 12px;
-            padding: 18px;
-            cursor: pointer;
-            text-align: center;
-            color: white;
-            transition: all 0.3s;
-        }
-
-        .service-item:hover {
-            transform: translateY(-3px);
-            border-color: #D4AF37;
-            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-        }
-
-        .service-item.selected {
-            background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%);
-            border-color: #FFD700;
-            box-shadow: 0 0 15px rgba(212,175,55,0.5);
-        }
-
-        .service-name {
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-
-        .service-price {
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .service-item.selected .service-price {
-            color: white;
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            background: rgba(0,0,0,0.6);
-            border-radius: 12px;
-            overflow-x: auto;
-        }
-
-        .data-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th, .data-table td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid rgba(212,175,55,0.3);
-            color: white;
-        }
-
-        .data-table th {
-            color: #FFD700;
-            font-weight: bold;
-            background: rgba(139,0,0,0.4);
-        }
-
-        .data-table tr:hover {
-            background: rgba(212,175,55,0.1);
-        }
-
-        /* Status Badges */
-        .status {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: inline-block;
-            font-weight: bold;
-        }
-
-        .status-pendente { background: #FFC107; color: #000; }
-        .status-confirmado { background: #28A745; color: #fff; }
-        .status-concluido { background: #17A2B8; color: #fff; }
-        .status-cancelado { background: #DC3545; color: #fff; }
-
-        /* Action Buttons */
-        .action-btn {
-            padding: 5px 12px;
-            margin: 0 3px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            width: auto;
-            font-weight: bold;
-        }
-
-        .btn-confirm {
-            background: #28A745;
-            color: white;
-        }
-
-        .btn-cancel {
-            background: #DC3545;
-            color: white;
-        }
-
-        /* Messages */
-        .message {
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.success {
-            background: #28A745;
-            color: white;
-            display: block;
-        }
-
-        .message.error {
-            background: #DC3545;
-            color: white;
-            display: block;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #FFD700;
-            font-size: 12px;
-            border-top: 1px solid rgba(212,175,55,0.3);
-            margin-top: 20px;
-            background: rgba(0,0,0,0.5);
-        }
-
-        /* Scrollbar */
+        /* Scrollbar customizada */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
         }
-
         ::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: #1f1f1f;
+            border-radius: 10px;
         }
-
         ::-webkit-scrollbar-thumb {
-            background: #D4AF37;
-            border-radius: 4px;
+            background: #c9a03d;
+            border-radius: 10px;
         }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #FFD700;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
+        /* Animações de entrada para modais */
+        @keyframes fadeSlide {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(20px) scale(0.96);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
-
-        .page {
-            animation: fadeInUp 0.5s ease-out;
+        .modal-active {
+            animation: fadeSlide 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        /* Botões e cards com hover suave */
+        .hover-gold {
+            transition: all 0.2s;
+        }
+        .hover-gold:hover {
+            background-color: rgba(201, 160, 61, 0.15);
+            border-color: #c9a03d;
+        }
+        /* custom para status badges */
+        .badge-pulse {
+            box-shadow: 0 0 0 0 rgba(201, 160, 61, 0.7);
+            animation: pulse-gold 1.5s infinite;
+        }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(201, 160, 61, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(201, 160, 61, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(201, 160, 61, 0); }
+        }
+        /* touch-friendly */
+        button, .clickable {
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
     </style>
 </head>
-<body>
-    <div class="top-nav">
-        <div class="nav-container">
-            <div class="logo" onclick="showPage('dashboard')">
-                <span class="logo-icon">💈</span>
-                <span class="logo-text">Barbearia <span>Du Cortz</span></span>
+<body class="bg-[#0a0a0a] text-gray-200 antialiased">
+
+    <!-- Conteúdo principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-5 pb-24 md:pb-8">
+        
+        <!-- Cabeçalho com identidade -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-8 border-b border-[#c9a03d]/30 pb-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-[#e6c88a] to-[#b8860b] bg-clip-text text-transparent">
+                    <i class="fas fa-scissors mr-2 text-[#c9a03d]"></i> GoldCutz
+                </h1>
+                <p class="text-xs text-gray-400 tracking-wider mt-1">BARBER SHOP · GESTÃO PROFISSIONAL</p>
             </div>
-            <div class="nav-links">
-                <button class="nav-btn" onclick="showPage('dashboard')">🏠 Dashboard</button>
-                <button class="nav-btn" onclick="showPage('agendamento')">📅 Agendar</button>
-                <button class="nav-btn" onclick="showPage('lista')">📋 Agendamentos</button>
-                <button class="nav-btn" onclick="showPage('clientes')">👥 Clientes</button>
-                <button class="nav-btn" onclick="showPage('financeiro')">💰 Financeiro</button>
+            <div class="flex gap-2">
+                <button id="openQuickBookBtn" class="bg-[#c9a03d] hover:bg-[#dbb24e] text-black font-bold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 transition text-sm md:text-base">
+                    <i class="fas fa-plus-circle"></i> <span>Agendar Rápido</span>
+                </button>
             </div>
         </div>
-    </div>
 
-    <div class="main-content">
-        <!-- Dashboard Page -->
-        <div id="dashboard-page" class="page">
-            <div class="grid-4">
-                <div class="metric-card" onclick="showPage('clientes')">
-                    <div>👥 Clientes</div>
-                    <div class="metric-value" id="total-clientes">0</div>
-                </div>
-                <div class="metric-card" onclick="showPage('lista')">
-                    <div>📅 Agendamentos</div>
-                    <div class="metric-value" id="total-agendamentos">0</div>
-                </div>
-                <div class="metric-card">
-                    <div>💰 Receita Total</div>
-                    <div class="metric-value" id="receita-total">R$ 0</div>
-                </div>
-                <div class="metric-card">
-                    <div>⭐ Ticket Médio</div>
-                    <div class="metric-value" id="ticket-medio">R$ 0</div>
+        <!-- Dashboard Rápido (cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <!-- Próximo Cliente -->
+            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl hover:border-[#c9a03d]/60 transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm uppercase tracking-wider">Próximo Cliente</p>
+                        <p id="nextCustomerName" class="text-2xl font-bold text-white mt-1">—</p>
+                        <p id="nextCustomerTime" class="text-xs text-[#c9a03d] mt-1">aguardando</p>
+                    </div>
+                    <i class="fas fa-user-clock text-4xl text-[#c9a03d]/60"></i>
                 </div>
             </div>
-
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-title">🟡 Pendentes</div>
-                    <div style="font-size: 2.5rem; text-align: center; color: #FFC107;" id="pendentes">0</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">🟢 Confirmados</div>
-                    <div style="font-size: 2.5rem; text-align: center; color: #28A745;" id="confirmados">0</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">🔵 Concluídos</div>
-                    <div style="font-size: 2.5rem; text-align: center; color: #17A2B8;" id="concluidos">0</div>
+            <!-- Cadeiras Ocupadas -->
+            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm uppercase tracking-wider">Cadeiras Ocupadas</p>
+                        <p id="chairsOccupied" class="text-2xl font-bold text-white mt-1">0</p>
+                        <p class="text-xs text-gray-500">de 4 cadeiras</p>
+                    </div>
+                    <i class="fas fa-chair text-4xl text-[#c9a03d]/60"></i>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-title">📅 Próximos Agendamentos</div>
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr><th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th></tr>
-                        </thead>
-                        <tbody id="proximos-tbody"></tbody>
-                    </table>
+            <!-- Ganhos do Dia -->
+            <div class="bg-black/50 backdrop-blur-sm border border-[#c9a03d]/30 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm uppercase tracking-wider">Ganhos do Dia</p>
+                        <p id="dailyEarnings" class="text-2xl font-bold text-[#c9a03d] mt-1">R$ 0</p>
+                        <p class="text-xs text-gray-500">em serviços</p>
+                    </div>
+                    <i class="fas fa-coins text-4xl text-[#c9a03d]/60"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Agendamento Page -->
-        <div id="agendamento-page" class="page" style="display:none;">
-            <div class="card">
-                <div class="card-title">✂️ Novo Agendamento</div>
-                <form id="agendamento-form">
-                    <div class="form-group">
-                        <label>👤 Nome Completo *</label>
-                        <input type="text" id="nome" placeholder="Digite seu nome completo" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📧 E-mail</label>
-                        <input type="email" id="email" placeholder="seuemail@exemplo.com">
-                    </div>
-                    <div class="form-group">
-                        <label>📱 WhatsApp</label>
-                        <input type="tel" id="telefone" placeholder="(11) 99999-9999">
-                    </div>
-                    <div class="form-group">
-                        <label>🕐 Data e Horário *</label>
-                        <input type="datetime-local" id="horario" required>
-                    </div>
-                    <div class="form-group">
-                        <label>✂️ Selecione os Serviços *</label>
-                        <div class="services-grid" id="services-grid"></div>
-                    </div>
-                    <div class="form-group" style="text-align: center;">
-                        <div style="font-size: 1.3rem;">💰 <strong>Total:</strong> <strong id="total-valor" style="color: #FFD700;">R$ 0,00</strong></div>
-                    </div>
-                    <button type="submit">✅ Confirmar Agendamento</button>
-                </form>
-                <div id="agendamento-message" class="message"></div>
+        <!-- Timeline de Agendamentos + Controle de Status -->
+        <div class="bg-black/40 backdrop-blur-sm rounded-2xl border border-gray-800 p-4 md:p-6 shadow-2xl">
+            <div class="flex flex-wrap justify-between items-center mb-5 gap-2">
+                <h2 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-clock text-[#c9a03d]"></i> Agenda Hoje · Timeline</h2>
+                <span class="text-xs bg-gray-800 px-3 py-1 rounded-full text-gray-300">clique no status para alterar</span>
+            </div>
+            <div id="timelineContainer" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+                <!-- Lista dinâmica via JS -->
+                <div class="text-center text-gray-500 py-8">carregando agendamentos...</div>
             </div>
         </div>
+    </main>
 
-        <!-- Lista Page -->
-        <div id="lista-page" class="page" style="display:none;">
-            <div class="card">
-                <div class="card-title">📋 Lista de Agendamentos</div>
-                <div style="margin-bottom: 15px;">
-                    <select id="status-filtro" style="width: auto; display: inline-block; background: #2a2a2a; color: white; border: 1px solid #FFD700;">
-                        <option value="todos">📌 Todos</option>
-                        <option value="pendente">🟡 Pendentes</option>
-                        <option value="confirmado">🟢 Confirmados</option>
-                        <option value="concluido">🔵 Concluídos</option>
-                        <option value="cancelado">🔴 Cancelados</option>
+    <!-- MODAL QUICK BOOKING (Formulário de adição) -->
+    <div id="bookingModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 hidden transition-all duration-300 p-4">
+        <div class="bg-[#111111] rounded-3xl max-w-md w-full border border-[#c9a03d]/40 shadow-2xl modal-active overflow-hidden">
+            <div class="flex justify-between items-center p-5 border-b border-gray-800">
+                <h3 class="text-2xl font-bold flex gap-2"><i class="fas fa-cut text-[#c9a03d]"></i> Novo Agendamento</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Nome do Cliente</label>
+                    <input type="text" id="bookingName" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d] focus:outline-none" placeholder="Ex: João Silva">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Serviço</label>
+                    <select id="bookingService" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d]">
+                        <option value="Corte">✂️ Corte - R$ 45</option>
+                        <option value="Barba">🧔 Barba - R$ 35</option>
+                        <option value="Combo">🔥 Combo (Corte + Barba) - R$ 70</option>
+                        <option value="Navalha">🪒 Navalha Premium - R$ 55</option>
                     </select>
                 </div>
-                <div class="data-table" id="agendamentos-table"></div>
-            </div>
-        </div>
-
-        <!-- Clientes Page -->
-        <div id="clientes-page" class="page" style="display:none;">
-            <div class="card">
-                <div class="card-title">👥 Nossos Clientes</div>
-                <div class="data-table" id="clientes-table"></div>
-            </div>
-        </div>
-
-        <!-- Financeiro Page -->
-        <div id="financeiro-page" class="page" style="display:none;">
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title">📝 Lançar Despesa</div>
-                    <form id="despesa-form">
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <input type="text" id="descricao" placeholder="Ex: Compra de produtos" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Valor</label>
-                            <input type="number" id="valor-despesa" step="0.01" placeholder="0,00" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="categoria">
-                                <option>Aluguel</option>
-                                <option>Salários</option>
-                                <option>Produtos</option>
-                                <option>Marketing</option>
-                                <option>Manutenção</option>
-                                <option>Outros</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Data</label>
-                            <input type="date" id="data-despesa" required>
-                        </div>
-                        <button type="submit">💰 Lançar Despesa</button>
-                    </form>
-                    <div id="despesa-message" class="message"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">Horário (HH:MM)</label>
+                    <input type="time" id="bookingTime" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-[#c9a03d]" value="15:00">
                 </div>
-                <div class="card">
-                    <div class="card-title">📊 Resumo Financeiro</div>
-                    <div id="resumo-financeiro"></div>
+                <!-- Controle de comanda: seletor de serviços com soma automática (adicional) -->
+                <div class="bg-gray-900/60 rounded-xl p-3 border border-gray-800">
+                    <p class="text-sm font-semibold text-[#c9a03d] mb-2"><i class="fas fa-receipt"></i> Comanda Rápida (adicione extras)</p>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        <button type="button" data-extra="Corte" data-price="45" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Corte (R$45)</button>
+                        <button type="button" data-extra="Barba" data-price="35" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Barba (R$35)</button>
+                        <button type="button" data-extra="Hidratação" data-price="25" class="extra-service-btn bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full">+ Hidratação (R$25)</button>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-400">Total do serviço + extras:</span>
+                        <span id="dynamicTotalDisplay" class="text-xl font-bold text-[#c9a03d]">R$ 0</span>
+                    </div>
+                    <input type="hidden" id="totalPriceHidden" value="0">
                 </div>
-            </div>
-            <div class="card">
-                <div class="card-title">📋 Últimas Despesas</div>
-                <div class="data-table" id="despesas-table"></div>
+                <button id="confirmBookingBtn" class="w-full bg-[#c9a03d] hover:bg-[#b8860b] text-black font-bold py-3 rounded-xl mt-2 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-check-circle"></i> Confirmar Agendamento
+                </button>
             </div>
         </div>
-    </div>
-
-    <div class="footer">
-        <p>💈 Barbearia Du Cortz - Tradição, Estilo e Elegância</p>
-        <p>© 2024 - Todos os direitos reservados</p>
     </div>
 
     <script>
-        // ==================== DADOS DE TESTE ====================
-        let agendamentos = [];
-        let clientes = [];
-        let despesas = [];
-
-        // Inicializar dados de teste
-        function initDadosTeste() {
-            // Verificar se já existem dados
-            if (localStorage.getItem('agendamentos')) {
-                agendamentos = JSON.parse(localStorage.getItem('agendamentos'));
-                clientes = JSON.parse(localStorage.getItem('clientes'));
-                despesas = JSON.parse(localStorage.getItem('despesas'));
-            } else {
-                // Dados de teste
-                const agora = new Date();
-                
-                agendamentos = [
-                    { id: 1, nome: "Carlos Silva", email: "carlos@email.com", telefone: "(11) 99999-1111", data_horario: new Date(agora.getTime() + 2*60*60*1000).toISOString(), servicos: "Corte Simples", valor_total: 35, corte_simples: 1, barba: 0, sobrancelha: 0, pigmentacao: 0, luzes: 0, descolorimento: 0, status: "confirmado", data_criacao: new Date().toISOString() },
-                    { id: 2, nome: "Fernanda Lima", email: "fernanda@email.com", telefone: "(11) 99999-3333", data_horario: new Date(agora.getTime() + 24*60*60*1000 + 10*60*60*1000).toISOString(), servicos: "Corte Simples, Luzes", valor_total: 70, corte_simples: 1, barba: 0, sobrancelha: 0, pigmentacao: 0, luzes: 1, descolorimento: 0, status: "pendente", data_criacao: new Date().toISOString() },
-                    { id: 3, nome: "Roberto Santos", email: "roberto@email.com", telefone: "(11) 99999-2222", data_horario: new Date(agora.getTime() + 48*60*60*1000 + 14*60*60*1000).toISOString(), servicos: "Barba, Sobrancelha", valor_total: 20, corte_simples: 0, barba: 1, sobrancelha: 1, pigmentacao: 0, luzes: 0, descolorimento: 0, status: "confirmado", data_criacao: new Date().toISOString() },
-                    { id: 4, nome: "Julio Cesar", email: "julio@email.com", telefone: "(11) 99999-4444", data_horario: new Date(agora.getTime() + 72*60*60*1000 + 16*60*60*1000).toISOString(), servicos: "Corte Simples, Barba", valor_total: 45, corte_simples: 1, barba: 1, sobrancelha: 0, pigmentacao: 0, luzes: 0, descolorimento: 0, status: "pendente", data_criacao: new Date().toISOString() },
-                    { id: 5, nome: "Mariana Costa", email: "mariana@email.com", telefone: "(11) 99999-5555", data_horario: new Date(agora.getTime() + 96*60*60*1000 + 11*60*60*1000).toISOString(), servicos: "Pigmentação", valor_total: 50, corte_simples: 0, barba: 0, sobrancelha: 0, pigmentacao: 1, luzes: 0, descolorimento: 0, status: "confirmado", data_criacao: new Date().toISOString() },
-                    { id: 6, nome: "Carlos Silva", email: "carlos@email.com", telefone: "(11) 99999-1111", data_horario: new Date(agora.getTime() - 24*60*60*1000 - 3*60*60*1000).toISOString(), servicos: "Corte Simples", valor_total: 35, corte_simples: 1, barba: 0, sobrancelha: 0, pigmentacao: 0, luzes: 0, descolorimento: 0, status: "concluido", data_criacao: new Date().toISOString() }
-                ];
-                
-                clientes = [
-                    { id: 1, nome: "Carlos Silva", email: "carlos@email.com", telefone: "(11) 99999-1111", total_gasto: 185, ultima_visita: new Date().toISOString() },
-                    { id: 2, nome: "Roberto Santos", email: "roberto@email.com", telefone: "(11) 99999-2222", total_gasto: 85, ultima_visita: new Date().toISOString() },
-                    { id: 3, nome: "Fernanda Lima", email: "fernanda@email.com", telefone: "(11) 99999-3333", total_gasto: 190, ultima_visita: new Date().toISOString() },
-                    { id: 4, nome: "Julio Cesar", email: "julio@email.com", telefone: "(11) 99999-4444", total_gasto: 200, ultima_visita: new Date().toISOString() },
-                    { id: 5, nome: "Mariana Costa", email: "mariana@email.com", telefone: "(11) 99999-5555", total_gasto: 95, ultima_visita: new Date().toISOString() }
-                ];
-                
-                despesas = [
-                    { id: 1, descricao: "Aluguel da Loja", valor: 2500, categoria: "Aluguel", data: new Date().toISOString().split('T')[0] },
-                    { id: 2, descricao: "Compra de Produtos", valor: 850, categoria: "Produtos", data: new Date().toISOString().split('T')[0] },
-                    { id: 3, descricao: "Salário Barbeiro", valor: 2000, categoria: "Salários", data: new Date().toISOString().split('T')[0] },
-                    { id: 4, descricao: "Marketing Digital", valor: 300, categoria: "Marketing", data: new Date().toISOString().split('T')[0] }
-                ];
-                
-                salvarDados();
-            }
-        }
-
-        function salvarDados() {
-            localStorage.setItem('agendamentos', JSON.stringify(agendamentos));
-            localStorage.setItem('clientes', JSON.stringify(clientes));
-            localStorage.setItem('despesas', JSON.stringify(despesas));
-        }
-
-        function atualizarCliente(nome, email, telefone, valor_gasto, data_visita) {
-            let cliente = clientes.find(c => c.nome === nome);
-            if (cliente) {
-                cliente.total_gasto += valor_gasto;
-                cliente.ultima_visita = data_visita;
-                if (email) cliente.email = email;
-                if (telefone) cliente.telefone = telefone;
-            } else {
-                const novoId = clientes.length + 1;
-                clientes.push({
-                    id: novoId,
-                    nome: nome,
-                    email: email || '',
-                    telefone: telefone || '',
-                    total_gasto: valor_gasto,
-                    ultima_visita: data_visita
-                });
-            }
-            salvarDados();
-        }
-
-        // ==================== VARIÁVEIS GLOBAIS ====================
-        let servicosSelecionados = new Map();
-        
-        const servicos = [
-            { id: 'corte_simples', nome: '✂️ Corte Simples', preco: 35 },
-            { id: 'barba', nome: '🧔 Barba', preco: 10 },
-            { id: 'sobrancelha', nome: '👁️ Sobrancelha', preco: 10 },
-            { id: 'pigmentacao', nome: '🎨 Pigmentação', preco: 50 },
-            { id: 'luzes', nome: '✨ Luzes', preco: 35 },
-            { id: 'descolorimento', nome: '⚡ Descolorimento', preco: 50 }
+        // ---------- ESTADO GLOBAL ----------
+        // Estrutura dos agendamentos: cada item possui id, nome, horario, servico, precoTotal, status (pending, completed, late, canceled)
+        let appointments = [
+            { id: "a1", nome: "Carlos André", horario: "09:00", servico: "Combo", precoTotal: 70, status: "pending" },
+            { id: "a2", nome: "Rafael M.", horario: "10:30", servico: "Corte", precoTotal: 45, status: "pending" },
+            { id: "a3", nome: "Thiago Lima", horario: "12:00", servico: "Barba", precoTotal: 35, status: "pending" },
+            { id: "a4", nome: "Fernanda (Cliente)", horario: "14:15", servico: "Navalha", precoTotal: 55, status: "pending" },
+            { id: "a5", nome: "Matheus Gold", horario: "16:00", servico: "Combo", precoTotal: 70, status: "pending" },
+            { id: "a6", nome: "João Pedro", horario: "17:30", servico: "Corte", precoTotal: 45, status: "pending" }
         ];
 
-        // ==================== FUNÇÕES DE RENDERIZAÇÃO ====================
-        function renderServices() {
-            const grid = document.getElementById('services-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
-            servicos.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'service-item';
-                div.innerHTML = `<div class="service-name">${s.nome}</div><div class="service-price">R$ ${s.preco.toFixed(2)}</div>`;
-                div.onclick = () => toggleServico(div, s.id, s.preco);
-                grid.appendChild(div);
-            });
+        // Variáveis de estado auxiliares
+        let chairsOccupied = 2;  // Simulação: cadeiras ocupadas (baseado em status "completed"? mas usaremos para demo)
+        // Regra de negócio: "Cadeiras Ocupadas" serão contadas como agendamentos com status "pending" (atendendo agora) + completed recente? melhor lógica: pending = aguardando/em atendimento
+        // mas para fluidez: ocupação baseada em pending (horários próximos) + completed do dia, vamos customizar: para fins de UI: pending e late representam ocupação
+        function updateOccupiedChairs() {
+            const now = new Date();
+            const currentHourMin = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            // Conta agendamentos com horário menor ou igual ao atual + status pending ou late (simula ocupação)
+            let ocupadas = appointments.filter(app => {
+                if(app.status === 'canceled') return false;
+                if(app.status === 'completed') return false;
+                // se status pending ou late ou se horário <= agora e não concluído
+                const appTime = app.horario;
+                if(appTime <= currentHourMin && (app.status === 'pending' || app.status === 'late')) return true;
+                return (app.status === 'pending' || app.status === 'late');
+            }).length;
+            // limite de 4 cadeiras
+            chairsOccupied = Math.min(ocupadas, 4);
+            document.getElementById('chairsOccupied').innerText = chairsOccupied;
         }
 
-        function toggleServico(element, servico, preco) {
-            if (servicosSelecionados.has(servico)) {
-                servicosSelecionados.delete(servico);
-                element.classList.remove('selected');
+        // calcular ganhos do dia (soma de todos os agendamentos com status completed)
+        function calculateDailyEarnings() {
+            const todayStr = new Date().toISOString().slice(0,10);
+            // como não temos data completa, usamos completed independente do dia (para demo foco diário)
+            const earnings = appointments.filter(app => app.status === 'completed').reduce((sum, app) => sum + (app.precoTotal || 0), 0);
+            document.getElementById('dailyEarnings').innerHTML = `R$ ${earnings.toFixed(2)}`;
+            return earnings;
+        }
+
+        // Atualizar "Próximo Cliente": o agendamento pendente (pending/late) com horário mais próximo (ordem crescente)
+        function updateNextCustomer() {
+            const nowTime = getCurrentTimeString();
+            const pendingApps = appointments.filter(app => app.status !== 'completed' && app.status !== 'canceled')
+                .sort((a,b) => a.horario.localeCompare(b.horario));
+            let next = pendingApps[0];
+            if(next) {
+                document.getElementById('nextCustomerName').innerText = next.nome;
+                document.getElementById('nextCustomerTime').innerHTML = `<i class="fas fa-hourglass-half"></i> ${next.horario} · ${next.servico}`;
             } else {
-                servicosSelecionados.set(servico, preco);
-                element.classList.add('selected');
+                document.getElementById('nextCustomerName').innerText = "🏆 Dia finalizado";
+                document.getElementById('nextCustomerTime').innerHTML = "Nenhum pendente";
             }
-            updateTotal();
         }
 
-        function updateTotal() {
-            let total = 0;
-            servicosSelecionados.forEach((preco) => total += preco);
-            const totalEl = document.getElementById('total-valor');
-            if (totalEl) totalEl.textContent = `R$ ${total.toFixed(2)}`;
+        function getCurrentTimeString() {
+            const d = new Date();
+            return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
         }
 
-        function getServicosTexto() {
-            const servicosMap = {
-                'corte_simples': 'Corte Simples',
-                'barba': 'Barba',
-                'sobrancelha': 'Sobrancelha',
-                'pigmentacao': 'Pigmentação',
-                'luzes': 'Luzes',
-                'descolorimento': 'Descolorimento'
-            };
-            let servicosLista = [];
-            servicosSelecionados.forEach((_, servico) => servicosLista.push(servicosMap[servico]));
-            return servicosLista.join(', ');
-        }
-
-        // ==================== FUNÇÕES DE CARREGAMENTO ====================
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-            document.getElementById(`${page}-page`).style.display = 'block';
-            
-            if (page === 'dashboard') loadDashboard();
-            if (page === 'lista') loadAgendamentos();
-            if (page === 'clientes') loadClientes();
-            if (page === 'financeiro') loadFinanceiro();
-        }
-
-        function loadDashboard() {
-            const totalClientes = clientes.length;
-            const totalAgendamentos = agendamentos.length;
-            const receitaTotal = agendamentos.reduce((sum, a) => sum + a.valor_total, 0);
-            const pendentes = agendamentos.filter(a => a.status === 'pendente').length;
-            const confirmados = agendamentos.filter(a => a.status === 'confirmado').length;
-            const concluidos = agendamentos.filter(a => a.status === 'concluido').length;
-            const ticketMedio = totalAgendamentos > 0 ? receitaTotal / totalAgendamentos : 0;
-            
-            document.getElementById('total-clientes').textContent = totalClientes;
-            document.getElementById('total-agendamentos').textContent = totalAgendamentos;
-            document.getElementById('receita-total').textContent = `R$ ${receitaTotal.toFixed(2)}`;
-            document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toFixed(2)}`;
-            document.getElementById('pendentes').textContent = pendentes;
-            document.getElementById('confirmados').textContent = confirmados;
-            document.getElementById('concluidos').textContent = concluidos;
-            
-            const agora = new Date();
-            const proximos = agendamentos
-                .filter(a => new Date(a.data_horario) > agora)
-                .sort((a, b) => new Date(a.data_horario) - new Date(b.data_horario))
-                .slice(0, 10);
-            
-            const tbody = document.getElementById('proximos-tbody');
-            tbody.innerHTML = '';
-            proximos.forEach(a => {
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = a.nome;
-                row.insertCell(1).textContent = new Date(a.data_horario).toLocaleString('pt-BR');
-                row.insertCell(2).textContent = a.servicos;
-                row.insertCell(3).textContent = `R$ ${a.valor_total.toFixed(2)}`;
-                row.insertCell(4).innerHTML = `<span class="status status-${a.status}">${a.status === 'pendente' ? 'Pendente' : a.status === 'confirmado' ? 'Confirmado' : a.status === 'concluido' ? 'Concluído' : 'Cancelado'}</span>`;
-            });
-        }
-
-        function loadAgendamentos() {
-            const filtro = document.getElementById('status-filtro')?.value || 'todos';
-            let filtered = agendamentos;
-            if (filtro !== 'todos') {
-                filtered = agendamentos.filter(a => a.status === filtro);
-            }
-            filtered.sort((a, b) => new Date(b.data_horario) - new Date(a.data_horario));
-            
-            const container = document.getElementById('agendamentos-table');
-            if (!container) return;
-            
-            let html = '\\\\(\\\\(<thead>\\\\
-                <th>Cliente</th><th>Data/Horário</th><th>Serviços</th><th>Valor</th><th>Status</th><th>Ações</th>\\\\
-            </thead><tbody>';
-            filtered.forEach(a => {
-                html += `\\\\
-                    <td><strong>${a.nome}</strong></td>
-                    <td>${new Date(a.data_horario).toLocaleString('pt-BR')}</td>
-                    <td>${a.servicos}</td>
-                    <td>R$ ${a.valor_total.toFixed(2)}</td>
-                    <td><span class="status status-${a.status}">${a.status === 'pendente' ? 'Pendente' : a.status === 'confirmado' ? 'Confirmado' : a.status === 'concluido' ? 'Concluído' : 'Cancelado'}</span></td>
-                    <td>`;
-                if (a.status === 'pendente') {
-                    html += `<button class="action-btn btn-confirm" onclick="updateStatus(${a.id}, 'confirmado')">✅ Confirmar</button>`;
-                    html += `<button class="action-btn btn-cancel" onclick="updateStatus(${a.id}, 'cancelado')">❌ Cancelar</button>`;
-                } else if (a.status === 'confirmado') {
-                    html += `<button class="action-btn btn-confirm" onclick="updateStatus(${a.id}, 'concluido')">✅ Concluir</button>`;
+        // Função para verificar atrasados (horário < agora e status pending)
+        function checkLateAppointments() {
+            const now = getCurrentTimeString();
+            let changed = false;
+            appointments.forEach(app => {
+                if(app.status === 'pending' && app.horario < now) {
+                    app.status = 'late';
+                    changed = true;
                 }
-                html += `</td>
-                `;
             });
-            html += '</tbody>\\\\)\\\\)';
-            container.innerHTML = html;
-        }
-
-        function updateStatus(id, status) {
-            const index = agendamentos.findIndex(a => a.id === id);
-            if (index !== -1) {
-                agendamentos[index].status = status;
-                salvarDados();
-                loadAgendamentos();
-                loadDashboard();
+            if(changed) {
+                renderTimeline();
+                updateDashboard();
             }
         }
 
-        function loadClientes() {
-            const container = document.getElementById('clientes-table');
-            if (!container) return;
-            
-            let html = '\\\\(\\\\(<thead>\\\\
-                <th>Nome</th><th>Email</th><th>Telefone</th><th>Total Gasto</th><th>Última Visita</th>\\\\
-            </thead><tbody>';
-            clientes.forEach(c => {
-                html += `\\\\
-                    <td><strong>${c.nome}</strong></td>
-                    <td>${c.email || '-'}</td>
-                    <td>${c.telefone || '-'}</td>
-                    <td><span style="color: #FFD700;">R$ ${(c.total_gasto || 0).toFixed(2)}</span></td>
-                    <td>${c.ultima_visita ? new Date(c.ultima_visita).toLocaleDateString('pt-BR') : '-'}</td>
-                `;
-            });
-            html += '</tbody>\\\\)\\\\)';
-            container.innerHTML = html;
-        }
-
-        function loadFinanceiro() {
-            const receita = agendamentos.reduce((sum, a) => sum + a.valor_total, 0);
-            const despesaTotal = despesas.reduce((sum, d) => sum + d.valor, 0);
-            const lucro = receita - despesaTotal;
-            
-            document.getElementById('resumo-financeiro').innerHTML = `
-                <div style="margin-bottom:15px; padding:12px; background: rgba(42,42,42,0.8); border-radius:12px;">
-                    <div><strong>💰 Receita Total:</strong> <span style="color: #FFD700;">R$ ${receita.toFixed(2)}</span></div>
-                </div>
-                <div style="margin-bottom:15px; padding:12px; background: rgba(42,42,42,0.8); border-radius:12px;">
-                    <div><strong>📉 Despesas Totais:</strong> <span style="color: #FFD700;">R$ ${despesaTotal.toFixed(2)}</span></div>
-                </div>
-                <div style="padding:12px; background: linear-gradient(135deg, #8B0000 0%, #D4AF37 100%); border-radius:12px;">
-                    <div><strong>📈 Lucro Líquido:</strong> <span style="color: #FFD700;">R$ ${lucro.toFixed(2)}</span></div>
-                </div>
-            `;
-            
-            let html = '\\\\(\\\\(<thead>\\\\
-                <th>Descrição</th><th>Valor</th><th>Categoria</th><th>Data</th>\\\\
-            </thead><tbody>';
-            despesas.forEach(d => {
-                html += `\\\\
-                    <td>${d.descricao}</td>
-                    <td><span style="color: #FFD700;">R$ ${d.valor.toFixed(2)}</span></td>
-                    <td>${d.categoria}</td>
-                    <td>${new Date(d.data).toLocaleDateString('pt-BR')}</td>
-                `;
-            });
-            html += '</tbody>\\\\)\\\\)';
-            document.getElementById('despesas-table').innerHTML = html;
-        }
-
-        // ==================== EVENTOS ====================
-        document.getElementById('agendamento-form')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nome = document.getElementById('nome').value;
-            const email = document.getElementById('email').value;
-            const telefone = document.getElementById('telefone').value;
-            const horario = document.getElementById('horario').value;
-            
-            if (!nome || !horario || servicosSelecionados.size === 0) {
-                const msg = document.getElementById('agendamento-message');
-                msg.textContent = '❌ Preencha todos os campos obrigatórios e selecione pelo menos um serviço!';
-                msg.className = 'message error';
-                setTimeout(() => msg.style.display = 'none', 3000);
+        // Renderização da timeline com interação para alterar status (Concluído, Atrasado, Cancelar)
+        function renderTimeline() {
+            const container = document.getElementById('timelineContainer');
+            if(!container) return;
+            const sorted = [...appointments].sort((a,b) => a.horario.localeCompare(b.horario));
+            if(sorted.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 py-8 bg-gray-900/30 rounded-2xl"><i class="fas fa-calendar-day"></i> Nenhum agendamento hoje</div>`;
                 return;
             }
-            
-            let total = 0;
-            servicosSelecionados.forEach((preco) => total += preco);
-            
-            const novoId = agendamentos.length + 1;
-            const novoAgendamento = {
-                id: novoId,
-                nome: nome,
-                email: email,
-                telefone: telefone,
-                data_horario: new Date(horario).toISOString(),
-                servicos: getServicosTexto(),
-                valor_total: total,
-                corte_simples: servicosSelecionados.has('corte_simples') ? 1 : 0,
-                barba: servicosSelecionados.has('barba') ? 1 : 0,
-                sobrancelha: servicosSelecionados.has('sobrancelha') ? 1 : 0,
-                pigmentacao: servicosSelecionados.has('pigmentacao') ? 1 : 0,
-                luzes: servicosSelecionados.has('luzes') ? 1 : 0,
-                descolorimento: servicosSelecionados.has('descolorimento') ? 1 : 0,
-                status: 'pendente',
-                data_criacao: new Date().toISOString()
+            let html = '';
+            sorted.forEach(app => {
+                let statusConfig = {
+                    bg: 'bg-gray-800',
+                    icon: 'fa-hourglass-half',
+                    label: 'Pendente',
+                    textColor: 'text-gray-300'
+                };
+                if(app.status === 'completed') {
+                    statusConfig = { bg: 'bg-green-900/40', icon: 'fa-check-circle', label: 'Concluído', textColor: 'text-green-400', borderColor: 'border-green-600/40' };
+                } else if(app.status === 'late') {
+                    statusConfig = { bg: 'bg-red-900/40', icon: 'fa-exclamation-triangle', label: 'Atrasado', textColor: 'text-red-400', borderColor: 'border-red-600/40' };
+                } else if(app.status === 'canceled') {
+                    statusConfig = { bg: 'bg-gray-800/60', icon: 'fa-ban', label: 'Cancelado', textColor: 'text-gray-500', borderColor: 'border-gray-700' };
+                } else {
+                    statusConfig.borderColor = 'border-[#c9a03d]/30';
+                }
+                const borderClass = app.status === 'canceled' ? 'border-gray-700' : (app.status === 'completed' ? 'border-green-600/40' : (app.status === 'late' ? 'border-red-600/40' : 'border-l-[#c9a03d]'));
+                html += `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gray-900/60 rounded-2xl p-4 border-l-4 ${borderClass} hover-gold transition">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <span class="font-mono text-lg font-bold text-[#c9a03d]">${app.horario}</span>
+                                <h3 class="font-bold text-white text-lg">${escapeHtml(app.nome)}</h3>
+                                <span class="text-sm bg-gray-800 px-2 py-0.5 rounded-full">${escapeHtml(app.servico)}</span>
+                            </div>
+                            <div class="text-gray-400 text-sm mt-1">💰 Valor: R$ ${app.precoTotal.toFixed(2)}</div>
+                        </div>
+                        <div class="flex gap-2 items-center flex-wrap">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${statusConfig.bg} ${statusConfig.textColor}">
+                                <i class="fas ${statusConfig.icon}"></i> ${statusConfig.label}
+                            </span>
+                            ${app.status !== 'canceled' ? `
+                            <div class="flex gap-1">
+                                <button data-id="${app.id}" data-action="complete" class="bg-green-800/40 hover:bg-green-700 text-green-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold transition"><i class="fas fa-check"></i> Concluir</button>
+                                <button data-id="${app.id}" data-action="late" class="bg-red-800/40 hover:bg-red-700 text-red-300 hover:text-white px-3 py-1.5 rounded-full text-xs"><i class="fas fa-clock"></i> Atrasado</button>
+                                <button data-id="${app.id}" data-action="cancel" class="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1.5 rounded-full text-xs"><i class="fas fa-times"></i> Cancelar</button>
+                            </div>
+                            ` : `
+                            <span class="text-xs text-gray-500"><i class="fas fa-trash"></i> Cancelado</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            // Adiciona event listeners para os botões dinâmicos
+            document.querySelectorAll('[data-action="complete"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = btn.getAttribute('data-id');
+                    changeAppointmentStatus(id, 'completed');
+                });
+            });
+            document.querySelectorAll('[data-action="late"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = btn.getAttribute('data-id');
+                    changeAppointmentStatus(id, 'late');
+                });
+            });
+            document.querySelectorAll('[data-action="cancel"]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = btn.getAttribute('data-id');
+                    changeAppointmentStatus(id, 'canceled');
+                });
+            });
+        }
+
+        function changeAppointmentStatus(id, newStatus) {
+            const app = appointments.find(a => a.id === id);
+            if(app) {
+                if(newStatus === 'completed' && app.status === 'completed') return;
+                if(newStatus === 'canceled' && app.status === 'canceled') return;
+                app.status = newStatus;
+                // Se for concluído, ganhos do dia atualizam
+                renderTimeline();
+                updateDashboard();
+                // Feedback visual sutil
+                showToast(`Status alterado para ${newStatus === 'completed' ? 'Concluído' : (newStatus === 'late' ? 'Atrasado' : 'Cancelado')}`);
+            }
+        }
+
+        function updateDashboard() {
+            updateOccupiedChairs();
+            calculateDailyEarnings();
+            updateNextCustomer();
+        }
+
+        // Adicionar novo agendamento (Quick Booking)
+        function addAppointment(nome, servicoRaw, horario, precoTotal) {
+            // mapeamento de nome amigável
+            let servicoNome = servicoRaw;
+            if(servicoRaw.includes('Corte')) servicoNome = 'Corte';
+            else if(servicoRaw.includes('Barba') && !servicoRaw.includes('Combo')) servicoNome = 'Barba';
+            else if(servicoRaw.includes('Combo')) servicoNome = 'Combo';
+            else if(servicoRaw.includes('Navalha')) servicoNome = 'Navalha';
+            const newId = 'id_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
+            const novoApp = {
+                id: newId,
+                nome: nome.trim(),
+                horario: horario,
+                servico: servicoNome,
+                precoTotal: precoTotal,
+                status: 'pending'
             };
-            
-            agendamentos.push(novoAgendamento);
-            atualizarCliente(nome, email, telefone, total, new Date().toISOString());
-            
-            const msg = document.getElementById('agendamento-message');
-            msg.textContent = '✅ Agendamento realizado com sucesso!';
-            msg.className = 'message success';
-            document.getElementById('agendamento-form').reset();
-            servicosSelecionados.clear();
-            document.querySelectorAll('.service-item').forEach(i => i.classList.remove('selected'));
-            updateTotal();
-            
+            // verificar conflito de horário (não permite duplicado)
+            const conflito = appointments.some(app => app.horario === horario && app.status !== 'canceled');
+            if(conflito) {
+                alert('❌ Horário já ocupado por outro agendamento ativo! Escolha outro horário.');
+                return false;
+            }
+            appointments.push(novoApp);
+            renderTimeline();
+            updateDashboard();
+            return true;
+        }
+
+        // Helper escapar HTML
+        function escapeHtml(str) {
+            if(!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Toast simples customizado
+        function showToast(msg) {
+            let toastDiv = document.createElement('div');
+            toastDiv.className = 'fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-[#c9a03d] text-black font-bold px-5 py-2 rounded-full shadow-xl text-sm z-50 flex items-center gap-2 animate-bounce';
+            toastDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+            document.body.appendChild(toastDiv);
             setTimeout(() => {
-                showPage('dashboard');
-                msg.style.display = 'none';
+                toastDiv.remove();
             }, 2000);
-        });
-        
-        document.getElementById('despesa-form')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const descricao = document.getElementById('descricao').value;
-            const valor = parseFloat(document.getElementById('valor-despesa').value);
-            const categoria = document.getElementById('categoria').value;
-            const data = document.getElementById('data-despesa').value;
+        }
+
+        // ---------- LÓGICA DE COMANDA (soma automática dos valores) ----------
+        function setupCommandLogic() {
+            const serviceSelect = document.getElementById('bookingService');
+            const extraBtns = document.querySelectorAll('.extra-service-btn');
+            let currentExtrasTotal = 0;
+            let basePrice = 0;
             
-            const novaDespesa = {
-                id: despesas.length + 1,
-                descricao: descricao,
-                valor: valor,
-                categoria: categoria,
-                data: data
+            function getBasePriceFromSelect() {
+                const val = serviceSelect.value;
+                if(val === 'Corte') return 45;
+                if(val === 'Barba') return 35;
+                if(val === 'Combo') return 70;
+                if(val === 'Navalha') return 55;
+                return 45;
+            }
+            function updateTotal() {
+                basePrice = getBasePriceFromSelect();
+                const total = basePrice + currentExtrasTotal;
+                document.getElementById('dynamicTotalDisplay').innerHTML = `R$ ${total.toFixed(2)}`;
+                document.getElementById('totalPriceHidden').value = total;
+            }
+            serviceSelect.addEventListener('change', () => updateTotal());
+            extraBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const price = parseFloat(btn.getAttribute('data-price'));
+                    currentExtrasTotal += price;
+                    updateTotal();
+                    // feedback visual
+                    btn.classList.add('bg-[#c9a03d]', 'text-black');
+                    setTimeout(() => btn.classList.remove('bg-[#c9a03d]', 'text-black'), 200);
+                });
+            });
+            updateTotal();
+            // retornar função para pegar total atual
+            return () => parseFloat(document.getElementById('totalPriceHidden').value);
+        }
+
+        // Modal e eventos
+        const modal = document.getElementById('bookingModal');
+        const openBtn = document.getElementById('openQuickBookBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const confirmBtn = document.getElementById('confirmBookingBtn');
+        let getTotalValue = null;
+
+        function initModal() {
+            getTotalValue = setupCommandLogic();
+            openBtn.onclick = () => {
+                modal.classList.remove('hidden');
+                // reset básico
+                document.getElementById('bookingName').value = '';
+                document.getElementById('bookingService').value = 'Combo';
+                document.getElementById('bookingTime').value = '15:00';
+                // reset extras dinamicamente, recriar lógica ou apenas redefinir
+                // melhor: recarregar estado da comanda
+                const serviceSelect = document.getElementById('bookingService');
+                serviceSelect.dispatchEvent(new Event('change'));
+                // limpar total extras do display, mas a função já atualiza;
+                // Forçar novo cálculo
+                if(getTotalValue) getTotalValue = setupCommandLogic(); // reaplica
+                getTotalValue = setupCommandLogic();
             };
-            
-            despesas.push(novaDespesa);
-            salvarDados();
-            
-            const msg = document.getElementById('despesa-message');
-            msg.textContent = '✅ Despesa lançada com sucesso!';
-            msg.className = 'message success';
-            document.getElementById('despesa-form').reset();
-            loadFinanceiro();
-            
-            setTimeout(() => msg.style.display = 'none', 3000);
-        });
-        
-        document.getElementById('status-filtro')?.addEventListener('change', () => loadAgendamentos());
-        
-        // ==================== INICIALIZAÇÃO ====================
-        initDadosTeste();
-        renderServices();
-        
-        const hoje = new Date();
-        hoje.setDate(hoje.getDate() + 1);
-        hoje.setHours(8, 0, 0);
-        const horarioInput = document.getElementById('horario');
-        if (horarioInput) horarioInput.min = hoje.toISOString().slice(0, 16);
-        
-        loadDashboard();
+            closeModalBtn.onclick = () => modal.classList.add('hidden');
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) modal.classList.add('hidden');
+            });
+            confirmBtn.onclick = () => {
+                const nome = document.getElementById('bookingName').value.trim();
+                const servicoSelect = document.getElementById('bookingService');
+                const servicoTexto = servicoSelect.options[servicoSelect.selectedIndex].text;
+                const horario = document.getElementById('bookingTime').value;
+                if(!nome) {
+                    alert('Digite o nome do cliente');
+                    return;
+                }
+                if(!horario) {
+                    alert('Selecione um horário');
+                    return;
+                }
+                let totalPriceFinal = 0;
+                if(getTotalValue) totalPriceFinal = getTotalValue();
+                else totalPriceFinal = 70; // fallback
+                const success = addAppointment(nome, servicoTexto, horario, totalPriceFinal);
+                if(success) {
+                    modal.classList.add('hidden');
+                    showToast(`Agendado ${nome} às ${horario} - Total R$ ${totalPriceFinal}`);
+                }
+            };
+        }
+
+        // Inicializar e executar verificações de atrasados a cada minuto
+        function init() {
+            renderTimeline();
+            updateDashboard();
+            initModal();
+            setInterval(() => {
+                checkLateAppointments();
+                updateDashboard();
+            }, 30000); // a cada 30s verifica atrasados
+            // auto marcação de atraso ao carregar
+            checkLateAppointments();
+        }
+        init();
     </script>
+    <!-- Rodapé sutil -->
+    <footer class="text-center text-gray-500 text-xs py-6 mt-4 border-t border-gray-800/40">
+        <i class="fas fa-cut"></i> GoldCutz Gestão · Modo Profissional · Status em tempo real
+    </footer>
 </body>
 </html>
