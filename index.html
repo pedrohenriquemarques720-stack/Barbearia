@@ -16,10 +16,66 @@
         * {
             transition: all 0.2s ease;
         }
+        
         body {
-            background: #0a0a0a;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            position: relative;
+            min-height: 100vh;
         }
+        
+        /* Estilo para garantir todos os textos em branco e negrito */
+        body, p, span, div, h1, h2, h3, h4, h5, h6, label, input, select, textarea, button, li, a, .text-gray-400, .text-gray-300, .text-gray-500 {
+            color: #FFFFFF !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Exceção para textos que devem ter outra cor (ex: placeholder) */
+        input::placeholder, textarea::placeholder, select:invalid {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: 500 !important;
+        }
+        
+        /* Manter cor dourada para ícones e elementos especiais */
+        .text-\\[\\#c9a03d\\], .text-\\[\\#c9a03d\\] *, [class*="text-\\[#c9a03d"] {
+            color: #c9a03d !important;
+        }
+        
+        /* Fundo com imagem para telas de cliente e agenda */
+        .bg-with-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: url('https://raw.githubusercontent.com/pedrohenriquemarques720-stack/Barbearia/main/barber1.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Overlay escuro para garantir legibilidade */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: -1;
+        }
+        
+        /* Quando admin estiver logado, remove a imagem de fundo para foco total */
+        body.admin-mode .bg-with-image {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        body.admin-mode .bg-overlay {
+            background: #0a0a0a;
+        }
+        
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -31,6 +87,7 @@
             background: #c9a03d;
             border-radius: 10px;
         }
+        
         @keyframes fadeSlide {
             from {
                 opacity: 0;
@@ -41,51 +98,138 @@
                 transform: translateY(0) scale(1);
             }
         }
+        
         .modal-active {
             animation: fadeSlide 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
         }
+        
         .hover-gold:hover {
             background-color: rgba(201, 160, 61, 0.15);
             border-color: #c9a03d;
         }
+        
         .flatpickr-calendar {
             background: #1a1a1a !important;
             border: 1px solid #c9a03d !important;
             border-radius: 20px !important;
         }
+        
+        .flatpickr-calendar .flatpickr-day {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+        
         .flatpickr-calendar .flatpickr-day.selected {
             background: #c9a03d !important;
-            color: #0a0a0a !important;
+            color: #000000 !important;
+            font-weight: 700 !important;
         }
+        
+        .flatpickr-calendar .flatpickr-day.today {
+            border-color: #c9a03d !important;
+            color: #c9a03d !important;
+        }
+        
+        .flatpickr-calendar .flatpickr-weekday {
+            color: #c9a03d !important;
+            font-weight: 700 !important;
+        }
+        
+        .flatpickr-calendar .flatpickr-month {
+            color: #c9a03d !important;
+        }
+        
         .tab-active {
             background: #c9a03d !important;
-            color: #0a0a0a !important;
+            color: #000000 !important;
         }
+        
         .btn-admin {
             background: linear-gradient(135deg, #c9a03d, #b8860b);
         }
+        
         /* Estilo para inputs de data/hora ocupados */
         .time-slot-taken {
             background-color: rgba(201, 160, 61, 0.2);
-            color: #c9a03d;
+            color: #c9a03d !important;
             cursor: not-allowed;
+        }
+        
+        /* Cards com fundo mais escuro para garantir contraste com a imagem */
+        .dark-card {
+            background: rgba(0, 0, 0, 0.7) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 160, 61, 0.4);
+        }
+        
+        /* Ajuste para o container principal */
+        .main-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Navbar com fundo mais escuro para destacar */
+        .navbar-dark {
+            background: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(12px);
+        }
+        
+        /* Animações suaves para os cards */
+        .dark-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .dark-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 160, 61, 0.2);
+        }
+        
+        /* Botões com texto em negrito */
+        button, .btn-primary, .btn-secondary {
+            font-weight: 700 !important;
+        }
+        
+        /* Inputs e selects com texto branco negrito */
+        input, select, textarea {
+            font-weight: 600 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Opções do select */
+        option {
+            font-weight: 600 !important;
+            color: #ffffff !important;
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Links e textos especiais */
+        a, .text-link {
+            font-weight: 700 !important;
+        }
+        
+        /* Badges e status */
+        .badge-status, .bg-\\[\\#c9a03d\\]\\/20 {
+            font-weight: 700 !important;
         }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-gray-200">
+<body id="appBody">
+    <!-- Elementos de fundo -->
+    <div class="bg-with-image"></div>
+    <div class="bg-overlay"></div>
 
     <!-- Barra de Navegação Principal -->
-    <nav class="bg-black/80 backdrop-blur-md border-b border-[#c9a03d]/30 sticky top-0 z-50">
+    <nav class="navbar-dark border-b border-[#c9a03d]/30 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <i class="fas fa-cut text-2xl text-[#c9a03d]"></i>
-                    <span class="text-xl font-bold bg-gradient-to-r from-[#e6c88a] to-[#b8860b] bg-clip-text text-transparent">Du Cortz</span>
+                    <span class="text-xl font-black bg-gradient-to-r from-[#e6c88a] to-[#b8860b] bg-clip-text text-transparent" style="font-weight: 900 !important;">Du Cortz</span>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="switchMainTab('cliente')" id="tabClienteBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">👤 Cliente</button>
-                    <button onclick="switchMainTab('agenda')" id="tabAgendaBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">📅 Agenda</button>
-                    <button onclick="openAdminLogin()" id="tabAdminBtn" class="px-4 py-2 rounded-full text-sm font-semibold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">
+                    <button onclick="switchMainTab('cliente')" id="tabClienteBtn" class="px-4 py-2 rounded-full text-sm font-bold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">👤 Cliente</button>
+                    <button onclick="switchMainTab('agenda')" id="tabAgendaBtn" class="px-4 py-2 rounded-full text-sm font-bold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">📅 Agenda</button>
+                    <button onclick="openAdminLogin()" id="tabAdminBtn" class="px-4 py-2 rounded-full text-sm font-bold bg-[#c9a03d]/20 hover:bg-[#c9a03d]/40 transition">
                         <i class="fas fa-lock"></i> Admin
                     </button>
                 </div>
@@ -93,50 +237,50 @@
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 main-container">
         <!-- TELA DO CLIENTE -->
         <div id="clientePanel" class="main-panel">
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- Formulário de Agendamento -->
-                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
-                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-calendar-plus text-[#c9a03d]"></i> Faça seu Agendamento</h2>
+                <div class="dark-card rounded-2xl p-6">
+                    <h2 class="text-2xl font-black mb-4"><i class="fas fa-calendar-plus text-[#c9a03d]"></i> Faça seu Agendamento</h2>
                     <form id="clientBookingForm">
                         <div class="mb-3">
-                            <label class="block text-sm mb-1">Seu Nome</label>
-                            <input type="text" id="clientName" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white" required>
+                            <label class="block text-sm font-bold mb-1">Seu Nome</label>
+                            <input type="text" id="clientName" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-white font-bold focus:border-[#c9a03d] focus:outline-none" required>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-sm mb-1">Telefone</label>
-                            <input type="tel" id="clientPhone" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white" required>
+                            <label class="block text-sm font-bold mb-1">Telefone</label>
+                            <input type="tel" id="clientPhone" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-white font-bold focus:border-[#c9a03d] focus:outline-none" required>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-sm mb-1">Data</label>
-                            <input type="text" id="clientDate" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white cursor-pointer" placeholder="Selecione a data" readonly>
+                            <label class="block text-sm font-bold mb-1">Data</label>
+                            <input type="text" id="clientDate" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-white font-bold cursor-pointer focus:border-[#c9a03d] focus:outline-none" placeholder="Selecione a data" readonly>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-sm mb-1">Horário</label>
-                            <select id="clientTime" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white">
+                            <label class="block text-sm font-bold mb-1">Horário</label>
+                            <select id="clientTime" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-white font-bold focus:border-[#c9a03d] focus:outline-none">
                                 <!-- Preenchido via JS -->
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="block text-sm mb-1">Serviço</label>
-                            <select id="clientService" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 text-white">
+                            <label class="block text-sm font-bold mb-1">Serviço</label>
+                            <select id="clientService" class="w-full bg-gray-900/80 border border-gray-700 rounded-xl px-4 py-2 text-white font-bold focus:border-[#c9a03d] focus:outline-none">
                                 <option value="Corte|45">✂️ Corte - R$ 45</option>
                                 <option value="Barba|35">🧔 Barba - R$ 35</option>
                                 <option value="Combo|70">🔥 Combo (Corte+Barba) - R$ 70</option>
                                 <option value="Navalha|55">🪒 Navalha Premium - R$ 55</option>
                             </select>
                         </div>
-                        <button type="submit" class="w-full bg-[#c9a03d] text-black font-bold py-2 rounded-xl">Confirmar Agendamento</button>
+                        <button type="submit" class="w-full bg-[#c9a03d] text-black font-black py-2 rounded-xl hover:bg-[#dbb24e] transition transform hover:scale-[1.02]">Confirmar Agendamento</button>
                     </form>
                 </div>
 
                 <!-- Meus Agendamentos (Cliente) -->
-                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
-                    <h2 class="text-2xl font-bold mb-4"><i class="fas fa-list-alt text-[#c9a03d]"></i> Meus Agendamentos</h2>
+                <div class="dark-card rounded-2xl p-6">
+                    <h2 class="text-2xl font-black mb-4"><i class="fas fa-list-alt text-[#c9a03d]"></i> Meus Agendamentos</h2>
                     <div id="myAppointmentsList" class="space-y-2 max-h-[400px] overflow-y-auto">
-                        <p class="text-gray-400 text-center">Nenhum agendamento encontrado</p>
+                        <p class="text-center font-bold">Digite seu telefone para ver seus horários</p>
                     </div>
                 </div>
             </div>
@@ -144,14 +288,14 @@
 
         <!-- TELA DE AGENDA PÚBLICA (Visualização Geral) -->
         <div id="agendaPanel" class="main-panel hidden">
-            <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-[#c9a03d]/30">
+            <div class="dark-card rounded-2xl p-6">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                    <h2 class="text-2xl font-bold"><i class="fas fa-calendar-alt text-[#c9a03d]"></i> Agenda do Barbeiro</h2>
+                    <h2 class="text-2xl font-black"><i class="fas fa-calendar-alt text-[#c9a03d]"></i> Agenda do Barbeiro</h2>
                     <div class="flex gap-2">
-                        <button onclick="changePublicDate(-1)" class="bg-gray-800 px-3 py-1 rounded-full"><i class="fas fa-chevron-left"></i></button>
-                        <span id="publicDateLabel" class="text-[#c9a03d] font-mono"></span>
-                        <button onclick="changePublicDate(1)" class="bg-gray-800 px-3 py-1 rounded-full"><i class="fas fa-chevron-right"></i></button>
-                        <button onclick="setPublicToday()" class="bg-[#c9a03d]/20 px-3 py-1 rounded-full text-sm">Hoje</button>
+                        <button onclick="changePublicDate(-1)" class="bg-gray-800/80 hover:bg-gray-700 px-3 py-1 rounded-full transition font-bold"><i class="fas fa-chevron-left"></i></button>
+                        <span id="publicDateLabel" class="text-[#c9a03d] font-black bg-black/50 px-3 py-1 rounded-full"></span>
+                        <button onclick="changePublicDate(1)" class="bg-gray-800/80 hover:bg-gray-700 px-3 py-1 rounded-full transition font-bold"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="setPublicToday()" class="bg-[#c9a03d]/30 hover:bg-[#c9a03d]/50 px-3 py-1 rounded-full text-sm transition font-bold">Hoje</button>
                     </div>
                 </div>
                 <div id="publicScheduleList" class="space-y-2 max-h-[500px] overflow-y-auto">
@@ -162,13 +306,13 @@
 
         <!-- MODAL DE LOGIN ADMIN -->
         <div id="adminLoginModal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 hidden">
-            <div class="bg-[#111111] rounded-2xl p-6 max-w-md w-full border border-[#c9a03d]">
-                <h2 class="text-2xl font-bold mb-4"><i class="fas fa-crown text-[#c9a03d]"></i> Acesso Admin</h2>
-                <input type="text" id="adminUser" placeholder="Usuário" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white">
-                <input type="password" id="adminPass" placeholder="Senha" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white">
-                <button onclick="doAdminLogin()" class="w-full bg-[#c9a03d] text-black font-bold py-2 rounded-xl">Entrar</button>
-                <button onclick="closeAdminLogin()" class="w-full mt-2 text-gray-400">Cancelar</button>
-                <p id="loginErrorMsg" class="text-red-400 text-sm mt-2 hidden"></p>
+            <div class="bg-[#111111] rounded-2xl p-6 max-w-md w-full border border-[#c9a03d] modal-active">
+                <h2 class="text-2xl font-black mb-4"><i class="fas fa-crown text-[#c9a03d]"></i> Acesso Admin</h2>
+                <input type="text" id="adminUser" placeholder="Usuário" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white font-bold focus:border-[#c9a03d] focus:outline-none">
+                <input type="password" id="adminPass" placeholder="Senha" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2 mb-3 text-white font-bold focus:border-[#c9a03d] focus:outline-none">
+                <button onclick="doAdminLogin()" class="w-full bg-[#c9a03d] text-black font-black py-2 rounded-xl hover:bg-[#dbb24e] transition">Entrar</button>
+                <button onclick="closeAdminLogin()" class="w-full mt-2 text-gray-400 hover:text-white transition font-bold">Cancelar</button>
+                <p id="loginErrorMsg" class="text-red-400 text-sm mt-2 hidden font-bold"></p>
             </div>
         </div>
 
@@ -177,36 +321,36 @@
             <div class="space-y-6">
                 <!-- Cards Financeiros -->
                 <div class="grid md:grid-cols-3 gap-4">
-                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
-                        <p class="text-gray-300 text-sm">💰 Ganhos Hoje</p>
-                        <p id="adminDailyEarning" class="text-3xl font-bold text-[#c9a03d]">R$ 0</p>
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50 backdrop-blur-sm">
+                        <p class="text-sm font-bold">💰 Ganhos Hoje</p>
+                        <p id="adminDailyEarning" class="text-3xl font-black text-[#c9a03d]">R$ 0</p>
                     </div>
-                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
-                        <p class="text-gray-300 text-sm">📊 Receita do Mês</p>
-                        <p id="adminMonthlyEarning" class="text-3xl font-bold text-[#c9a03d]">R$ 0</p>
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50 backdrop-blur-sm">
+                        <p class="text-sm font-bold">📊 Receita do Mês</p>
+                        <p id="adminMonthlyEarning" class="text-3xl font-black text-[#c9a03d]">R$ 0</p>
                     </div>
-                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50">
-                        <p class="text-gray-300 text-sm">🎯 Total de Cortes</p>
-                        <p id="adminTotalCuts" class="text-3xl font-bold text-[#c9a03d]">0</p>
+                    <div class="bg-gradient-to-br from-[#c9a03d]/20 to-black/80 rounded-2xl p-5 border border-[#c9a03d]/50 backdrop-blur-sm">
+                        <p class="text-sm font-bold">🎯 Total de Cortes</p>
+                        <p id="adminTotalCuts" class="text-3xl font-black text-[#c9a03d]">0</p>
                     </div>
                 </div>
 
                 <!-- Indicadores Mensais -->
-                <div class="bg-black/50 rounded-2xl p-5 border border-gray-800">
-                    <h3 class="text-xl font-bold mb-3"><i class="fas fa-chart-line text-[#c9a03d]"></i> Indicadores do Mês</h3>
+                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-5 border border-gray-800">
+                    <h3 class="text-xl font-black mb-3"><i class="fas fa-chart-line text-[#c9a03d]"></i> Indicadores do Mês</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                        <div><p class="text-gray-400 text-xs">Média Diária</p><p id="adminAvgDaily" class="text-lg font-bold text-[#c9a03d]">R$ 0</p></div>
-                        <div><p class="text-gray-400 text-xs">Ticket Médio</p><p id="adminAvgTicket" class="text-lg font-bold text-[#c9a03d]">R$ 0</p></div>
-                        <div><p class="text-gray-400 text-xs">Agendamentos Mês</p><p id="adminMonthlyCount" class="text-lg font-bold text-[#c9a03d]">0</p></div>
-                        <div><p class="text-gray-400 text-xs">Cancelamentos</p><p id="adminCancelledCount" class="text-lg font-bold text-red-400">0</p></div>
+                        <div><p class="text-xs font-bold">Média Diária</p><p id="adminAvgDaily" class="text-lg font-black text-[#c9a03d]">R$ 0</p></div>
+                        <div><p class="text-xs font-bold">Ticket Médio</p><p id="adminAvgTicket" class="text-lg font-black text-[#c9a03d]">R$ 0</p></div>
+                        <div><p class="text-xs font-bold">Agendamentos Mês</p><p id="adminMonthlyCount" class="text-lg font-black text-[#c9a03d]">0</p></div>
+                        <div><p class="text-xs font-bold">Cancelamentos</p><p id="adminCancelledCount" class="text-lg font-black text-red-400">0</p></div>
                     </div>
                 </div>
 
                 <!-- Controles de Agenda Admin -->
-                <div class="bg-black/50 rounded-2xl p-5 border border-gray-800">
+                <div class="bg-black/50 backdrop-blur-sm rounded-2xl p-5 border border-gray-800">
                     <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                        <h3 class="text-xl font-bold"><i class="fas fa-clipboard-list"></i> Gerenciar Agendamentos</h3>
-                        <button onclick="showAdminBookingForm()" class="bg-[#c9a03d] text-black px-4 py-1 rounded-full text-sm"><i class="fas fa-plus"></i> Agendar Manual</button>
+                        <h3 class="text-xl font-black"><i class="fas fa-clipboard-list"></i> Gerenciar Agendamentos</h3>
+                        <button onclick="showAdminBookingForm()" class="bg-[#c9a03d] text-black font-black px-4 py-1 rounded-full text-sm hover:bg-[#dbb24e] transition"><i class="fas fa-plus"></i> Agendar Manual</button>
                     </div>
                     <div id="adminScheduleList" class="space-y-2 max-h-[500px] overflow-y-auto"></div>
                 </div>
@@ -308,22 +452,22 @@
         function renderMyAppointments(nomeFilter = '', phoneFilter = '') {
             const container = document.getElementById('myAppointmentsList');
             const phone = phoneFilter || document.getElementById('clientPhone')?.value;
-            if(!phone) { container.innerHTML = '<p class="text-gray-400 text-center">Digite seu telefone e agende para ver seus horários</p>'; return; }
+            if(!phone) { container.innerHTML = '<p class="text-center font-bold">Digite seu telefone para ver seus horários</p>'; return; }
             const userApps = appointments.filter(a => a.telefone === phone && a.status !== 'canceled');
             if(userApps.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-center">Nenhum agendamento encontrado para este telefone</p>';
+                container.innerHTML = '<p class="text-center font-bold">Nenhum agendamento encontrado para este telefone</p>';
                 return;
             }
             container.innerHTML = userApps.map(app => `
-                <div class="bg-gray-900 rounded-xl p-3 border-l-4 border-[#c9a03d]">
+                <div class="bg-gray-900/80 rounded-xl p-3 border-l-4 border-[#c9a03d]">
                     <div class="flex justify-between items-center">
                         <div>
-                            <p class="font-bold">${app.servico}</p>
-                            <p class="text-sm text-gray-400">📅 ${formatDate(app.data)} às ${app.horario}</p>
+                            <p class="font-black">${app.servico}</p>
+                            <p class="text-sm font-bold text-gray-300">📅 ${formatDate(app.data)} às ${app.horario}</p>
                         </div>
-                        <span class="text-xs ${app.status === 'completed' ? 'text-green-400' : 'text-[#c9a03d]'}">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
+                        <span class="text-xs font-bold ${app.status === 'completed' ? 'text-green-400' : 'text-[#c9a03d]'}">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
                     </div>
-                    <button onclick="cancelClientApp('${app.id}')" class="text-red-400 text-xs mt-2 hover:text-red-300">Cancelar agendamento</button>
+                    <button onclick="cancelClientApp('${app.id}')" class="text-red-400 text-xs mt-2 hover:text-red-300 font-bold">Cancelar agendamento</button>
                 </div>
             `).join('');
         }
@@ -346,16 +490,16 @@
             const filtered = appointments.filter(a => a.data === currentPublicDate && a.status !== 'canceled').sort((a,b) => a.horario.localeCompare(b.horario));
             document.getElementById('publicDateLabel').innerText = formatDate(currentPublicDate);
             if(filtered.length === 0) {
-                container.innerHTML = '<p class="text-gray-400 text-center py-8">Nenhum agendamento para esta data</p>';
+                container.innerHTML = '<p class="text-center font-bold py-8">Nenhum agendamento para esta data</p>';
                 return;
             }
             container.innerHTML = filtered.map(app => `
-                <div class="bg-gray-900 rounded-xl p-3 flex justify-between items-center flex-wrap gap-2">
+                <div class="bg-gray-900/80 rounded-xl p-3 flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <p class="font-bold">${app.nome}</p>
-                        <p class="text-sm text-gray-400">${app.servico} • ${app.horario}</p>
+                        <p class="font-black">${app.nome}</p>
+                        <p class="text-sm font-bold text-gray-300">${app.servico} • ${app.horario}</p>
                     </div>
-                    <span class="text-xs bg-[#c9a03d]/20 px-2 py-1 rounded-full">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
+                    <span class="text-xs font-bold bg-[#c9a03d]/20 px-2 py-1 rounded-full">${app.status === 'completed' ? '✓ Realizado' : '⏳ Agendado'}</span>
                 </div>
             `).join('');
         }
@@ -377,6 +521,8 @@
             if(user === 'adm123' && pass === '123adm') {
                 adminLoggedIn = true;
                 closeAdminLogin();
+                // Remove o fundo com imagem quando admin loga
+                document.getElementById('appBody').classList.add('admin-mode');
                 switchMainTab('admin');
                 renderAdminDashboard();
                 renderAdminSchedule();
@@ -420,19 +566,19 @@
         function renderAdminSchedule() {
             const container = document.getElementById('adminScheduleList');
             const sorted = [...appointments].sort((a,b) => (a.data + a.horario).localeCompare(b.data + b.horario));
-            if(sorted.length === 0) { container.innerHTML = '<p class="text-gray-400 text-center py-4">Nenhum agendamento</p>'; return; }
+            if(sorted.length === 0) { container.innerHTML = '<p class="text-center font-bold py-4">Nenhum agendamento</p>'; return; }
             container.innerHTML = sorted.map(app => `
-                <div class="bg-gray-900 rounded-xl p-3 border-l-4 ${app.status === 'completed' ? 'border-green-500' : (app.status === 'canceled' ? 'border-red-500' : 'border-[#c9a03d]')}">
+                <div class="bg-gray-900/80 rounded-xl p-3 border-l-4 ${app.status === 'completed' ? 'border-green-500' : (app.status === 'canceled' ? 'border-red-500' : 'border-[#c9a03d]')}">
                     <div class="flex justify-between items-start flex-wrap gap-2">
                         <div>
-                            <p class="font-bold">${app.nome} <span class="text-xs text-gray-400">📞 ${app.telefone}</span></p>
-                            <p class="text-sm">📅 ${formatDate(app.data)} às ${app.horario} • ${app.servico} • R$ ${app.preco}</p>
-                            <p class="text-xs text-gray-400">Status: ${app.status === 'pending' ? '⏳ Pendente' : (app.status === 'completed' ? '✓ Concluído' : '✗ Cancelado')}</p>
+                            <p class="font-black">${app.nome} <span class="text-xs font-bold text-gray-400">📞 ${app.telefone}</span></p>
+                            <p class="text-sm font-bold">📅 ${formatDate(app.data)} às ${app.horario} • ${app.servico} • R$ ${app.preco}</p>
+                            <p class="text-xs font-bold text-gray-400">Status: ${app.status === 'pending' ? '⏳ Pendente' : (app.status === 'completed' ? '✓ Concluído' : '✗ Cancelado')}</p>
                         </div>
                         <div class="flex gap-1">
-                            ${app.status !== 'completed' && app.status !== 'canceled' ? `<button onclick="adminComplete('${app.id}')" class="bg-green-600/30 hover:bg-green-600 px-2 py-1 rounded text-xs"><i class="fas fa-check"></i> Concluir</button>` : ''}
-                            ${app.status !== 'canceled' ? `<button onclick="adminCancel('${app.id}')" class="bg-red-600/30 hover:bg-red-600 px-2 py-1 rounded text-xs"><i class="fas fa-times"></i> Cancelar</button>` : ''}
-                            ${app.status === 'pending' ? `<button onclick="adminMarkLate('${app.id}')" class="bg-yellow-600/30 hover:bg-yellow-600 px-2 py-1 rounded text-xs"><i class="fas fa-clock"></i> Atrasado</button>` : ''}
+                            ${app.status !== 'completed' && app.status !== 'canceled' ? `<button onclick="adminComplete('${app.id}')" class="bg-green-600/30 hover:bg-green-600 px-2 py-1 rounded text-xs font-bold"><i class="fas fa-check"></i> Concluir</button>` : ''}
+                            ${app.status !== 'canceled' ? `<button onclick="adminCancel('${app.id}')" class="bg-red-600/30 hover:bg-red-600 px-2 py-1 rounded text-xs font-bold"><i class="fas fa-times"></i> Cancelar</button>` : ''}
+                            ${app.status === 'pending' ? `<button onclick="adminMarkLate('${app.id}')" class="bg-yellow-600/30 hover:bg-yellow-600 px-2 py-1 rounded text-xs font-bold"><i class="fas fa-clock"></i> Atrasado</button>` : ''}
                         </div>
                     </div>
                 </div>
